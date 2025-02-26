@@ -101,7 +101,7 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
             <button
               onClick={() => (window.location.href = "/profile")}
               
-              className="relative inline-flex items-center justify-center p-2 font-semibold leading-4 cursor-pointer rounded-xl transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 border border-transparent hover:border-teal-500"
+              className="relative inline-flex items-center justify-center p-auto font-semibold leading-4 cursor-pointer rounded-xl transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 border border-transparent hover:border-teal-500"
             >
               <div className="relative z-10 flex items-center justify-center space-x-2">
                 <Uiprofile className="w-8 h-8" />
@@ -216,7 +216,7 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
                       variant="outline"
                       className="w-full border-white text-white hover:bg-white hover:text-blue-900 border-b-2 border-transparent hover:border-white flex items-center justify-center"
                     >
-                      <Uiprofile className="w-5 h-5 mr-2" />
+                      <Uiprofile className="w-3 h-3 mr-3" />
                       Profile
                     </Button>
                     <Button
