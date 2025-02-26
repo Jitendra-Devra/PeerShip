@@ -1,123 +1,163 @@
-import React, { useState } from 'react';
-import { User, LogOut, Mail, Phone, Check, Moon, Sun, Lock, Camera, Shield, CreditCard, History, DollarSign } from 'lucide-react';
+import React, { useState } from "react";
+import { User, LogOut, Mail, Phone, Moon, Sun, Camera, Shield, DollarSign, History, Package, Truck, Settings, Bell } from "lucide-react";
 import Navbar from "../components/Navbar.jsx";
 
 const ProfilePage = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
-  const [profileData, setProfileData] = useState({
+  const [profileData] = useState({
     name: "Alex Johnson",
     email: "alex.johnson@example.com",
     phone: "+1 (555) 123-4567",
     isVerified: true,
-    profileImage: "/api/placeholder/150/150"
+    profileImage: "/api/placeholder/150/150",
+    walletBalance: "$132.40",
   });
-  
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
-  
+
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+
   const containerClass = darkMode 
-    ? "min-h-screen bg-gray-900 text-white pt-16" 
-    : "min-h-screen bg-gradient-to-b from-blue-50 to-white pt-16";
-  
-  const cardClass = darkMode 
-    ? "bg-gray-800 shadow-xl rounded-xl p-6 border border-gray-700" 
-    : "bg-white shadow-xl rounded-xl p-6 border border-blue-100";
-  
+    ? "min-h-screen bg-gray-900 text-white" 
+    : "min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50";
+
   return (
     <div className={containerClass}>
-      <Navbar
-        onSignInClick={() => setIsSignInOpen(true)}
-        onSignUpClick={() => setIsSignUpOpen(true)}
-      />
+      <Navbar />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className={cardClass}>
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-[#007BFF] to-[#28A745] bg-clip-text text-transparent">
-                My Profile
-              </h1>
-              <button 
-                onClick={toggleDarkMode} 
-                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                aria-label="Toggle dark mode"
-              >
-                {darkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-blue-800" />}
-              </button>
+      {/* Top Navigation Buttons */}
+      <div className="container mx-auto px-6 py-4">
+        <div className="flex flex-wrap gap-4 justify-between items-center">
+          <button className="border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition-colors duration-300 rounded-full px-6 py-2 font-medium">Peership</button>
+          <div className="flex flex-wrap gap-4">
+            <button className="border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition-colors duration-300 rounded-full px-6 py-2 font-medium">Explore deliveries</button>
+            <button className="border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition-colors duration-300 rounded-full px-6 py-2 font-medium">Post a new Delivery</button>
+            <button className="border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition-colors duration-300 rounded-full px-6 py-2 font-medium">Dashboard</button>
+            <button className="border-2 border-blue-500 bg-blue-100 text-blue-800 shadow-md rounded-full px-6 py-2 font-medium">Profile</button>
+          </div>
+        </div>
+      </div>
+      
+      <div className="container mx-auto px-6 py-6">
+        {/* Profile Section with horizontal layout */}
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-blue-100">
+          <div className="flex flex-col md:flex-row justify-between">
+            <div className="flex flex-col md:flex-row items-start gap-8">
+              {/* Profile Image */}
+              <div className="flex flex-col items-center">
+                <div className="relative w-48 h-48">
+                  <img src={profileData.profileImage} alt="Profile" className="w-full h-full rounded-full object-cover border-4 border-blue-500 shadow-md" />
+                  <button className="absolute bottom-2 right-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-2 rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
+                    <Camera size={16} />
+                  </button>
+                </div>
+                
+                {/* Verification Status below image */}
+                <div className="mt-4">
+                  {profileData.isVerified ? (
+                    <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full flex items-center shadow-sm">
+                      <Shield size={16} className="mr-2" /> Verified
+                    </div>
+                  ) : (
+                    <div className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full flex items-center shadow-sm">
+                      <Shield size={16} className="mr-2" /> Not Verified
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Profile Details to right of image */}
+              <div className="flex flex-col justify-center mt-6 md:mt-0">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-gray-800">Name- {profileData.name}</h2>
+                  
+                  {/* Edit Profile Button next to name */}
+                  <button className="bg-white border-2 border-blue-500 text-blue-600 rounded-lg py-2 px-6 ml-6 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center">
+                    <User size={16} className="mr-2" /> Edit Profile
+                  </button>
+                </div>
+                
+                <div className="flex items-center mt-4">
+                  <Mail size={18} className="text-blue-500 mr-2" />
+                  <p className="text-gray-700">Email- {profileData.email}</p>
+                </div>
+                
+                <div className="flex items-center mt-3">
+                  <Phone size={18} className="text-blue-500 mr-2" />
+                  <p className="text-gray-700">Phone number- {profileData.phone}</p>
+                </div>
+              </div>
             </div>
             
-            <div className="flex flex-col items-center mb-8">
-              <div className="relative mb-4">
-                <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-gradient-to-r from-[#007BFF] to-[#28A745] p-1">
-                  <img 
-                    src={profileData.profileImage} 
-                    alt="Profile" 
-                    className="w-full h-full rounded-full object-cover" 
-                  />
-                </div>
-                <button className="absolute bottom-2 right-2 bg-gradient-to-r from-[#007BFF] to-[#28A745] text-white p-2 rounded-full hover:shadow-lg transition-shadow">
-                  <Camera size={16} />
+            {/* Right side buttons */}
+            <div className="flex flex-col justify-between items-end mt-6 md:mt-0">
+              {/* Setting at top right */}
+              <div className="flex gap-4">
+                <button className="rounded-full border-2 border-blue-500 p-3 text-blue-600 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center">
+                  <Settings size={18} className="mr-2" />
+                  <span className="font-medium">Setting</span>
+                </button>
+                <button className="rounded-full border-2 border-blue-500 p-3 text-blue-600 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center">
+                  <Bell size={18} className="mr-2" />
+                  <span className="font-medium text-xs">Notification Settings</span>
                 </button>
               </div>
               
-              {profileData.isVerified && (
-                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-full flex items-center text-sm font-medium shadow-md">
-                  <Shield size={16} className="mr-2" />
-                  Verified User (Trusted for Delivery)
-                </div>
-              )}
+              {/* Sign Out at bottom right */}
+              <button className="bg-red-500 text-white rounded-lg py-2 px-8 w-40 hover:bg-red-600 transition-colors duration-300 shadow-md flex items-center justify-center mt-4 md:mt-0">
+                <LogOut size={18} className="mr-2" /> Sign out
+              </button>
             </div>
-            
-            <div className="space-y-6 mb-8">
-              <div className="flex items-center p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors">
-                <User className="mr-4 text-[#007BFF]" size={24} />
-                <div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Full Name</div>
-                  <div className="font-medium text-lg">{profileData.name}</div>
+          </div>
+        </div>
+
+        {/* Wallet Section - Below profile */}
+        <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-6 mb-8 hover:shadow-xl transition-shadow duration-300">
+          <h2 className="text-xl font-semibold text-blue-700 mb-6 flex items-center">
+            <DollarSign size={24} className="mr-2 text-blue-500" /> Wallet
+          </h2>
+          <div className="flex items-center gap-4 mb-6 bg-blue-50 p-4 rounded-lg">
+            <span className="text-lg font-medium text-gray-700">Current Balance</span>
+            <span className="text-2xl font-bold text-blue-600">${profileData.walletBalance}</span>
+          </div>
+          <div className="mb-4">
+            <h3 className="text-lg font-medium text-gray-700 mb-3">Prev Earning</h3>
+            <ol className="list-decimal pl-8 space-y-2">
+              <li className="text-blue-500 font-medium">----------</li>
+              <li className="text-blue-500 font-medium">----------</li>
+              <li className="text-blue-500 font-medium">----------</li>
+            </ol>
+          </div>
+        </div>
+
+        {/* Activity & History Section */}
+        <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+          <h2 className="text-xl font-semibold text-blue-700 mb-6 flex items-center">
+            <History size={24} className="mr-2 text-blue-500" /> Activity & History
+          </h2>
+          <div className="space-y-4">
+            <button className="text-blue-600 text-lg font-medium hover:text-blue-800 transition-colors duration-300 flex items-center">
+              <Package size={20} className="mr-2" /> Completed Deliveries
+            </button>
+            <hr className="border-blue-100" />
+            <button className="text-blue-600 text-lg font-medium hover:text-blue-800 transition-colors duration-300 flex items-center">
+              <Truck size={20} className="mr-2" /> Delivery History
+            </button>
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              <div className="p-5 bg-white border border-blue-100 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-center gap-3">
+                  <Truck size={24} className="text-blue-500" />
+                  <span className="font-medium text-gray-800">Chicago to Detroit</span>
+                </div>
+                <div className="text-sm text-green-600 font-medium mt-2 flex items-center">
+                  <Shield size={14} className="mr-2" /> Delivered on Feb 22, 2025
                 </div>
               </div>
-              
-              <div className="flex items-center p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors">
-                <Mail className="mr-4 text-[#007BFF]" size={24} />
-                <div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Email</div>
-                  <div className="font-medium text-lg">{profileData.email}</div>
+              <div className="p-5 bg-white border border-blue-100 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-center gap-3">
+                  <Package size={24} className="text-blue-500" />
+                  <span className="font-medium text-gray-800">New York to Boston</span>
                 </div>
-              </div>
-              
-              <div className="flex items-center p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors">
-                <Phone className="mr-4 text-[#007BFF]" size={24} />
-                <div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Phone</div>
-                  <div className="font-medium text-lg">{profileData.phone}</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Wallet & Payments</h2>
-              <div className="flex items-center p-3 rounded-lg border border-blue-100 dark:border-gray-700">
-                <DollarSign className="mr-4 text-green-500" size={24} />
-                <div className="text-lg font-medium">$120.50</div>
-                <button className="ml-auto bg-green-500 text-white px-3 py-1 rounded-lg">Withdraw</button>
-              </div>
-            </div>
-            
-            <div className={`${cardClass} mt-6`}>
-              <h2 className="text-xl font-semibold mb-4 bg-gradient-to-r from-[#007BFF] to-[#28A745] bg-clip-text text-transparent">Recent Activity</h2>
-              <div className="space-y-4">
-                <div className="p-3 rounded-lg border border-blue-100 dark:border-gray-700">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Package delivered</div>
-                  <div className="font-medium">New York to Boston</div>
-                  <div className="text-sm text-[#28A745]">Feb 22, 2025</div>
-                </div>
-                <div className="p-3 rounded-lg border border-blue-100 dark:border-gray-700">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Package in transit</div>
-                  <div className="font-medium">Chicago to Detroit</div>
-                  <div className="text-sm text-[#007BFF]">Feb 25, 2025</div>
+                <div className="text-sm text-blue-600 font-medium mt-2 flex items-center">
+                  <Truck size={14} className="mr-2" /> In Transit (Expected Feb 25, 2025)
                 </div>
               </div>
             </div>
