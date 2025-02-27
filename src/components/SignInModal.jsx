@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const SignInModal = ({ isOpen, onClose, onSwitchToSignUp }) => {
+const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -135,6 +135,7 @@ const SignInModal = ({ isOpen, onClose, onSwitchToSignUp }) => {
                 <div>
                   <button 
                     type="button"
+                    onClick={onForgotPassword} // Add onClick handler here
                     className="text-blue-600 font-semibold text-sm hover:underline"
                   >
                     Forgot Password?
