@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { User, LogOut, Mail, Phone, Moon, Sun, Camera, Shield, DollarSign, History, Package, Truck, Settings, Bell } from "lucide-react";
+import { Uisetting } from "../components/ui/Icons.jsx"; 
 import Navbar from "../components/Navbar.jsx";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [profileData] = useState({
     name: "Alex Johnson",
@@ -18,6 +21,10 @@ const ProfilePage = () => {
   const containerClass = darkMode 
     ? "min-h-screen bg-gray-900 text-white" 
     : "min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50";
+
+  const navigateToSettings = ()=>{
+    navigate("/profile/settings");
+  };
 
   return (
     <div className={containerClass}>
@@ -91,13 +98,10 @@ const ProfilePage = () => {
             <div className="flex flex-col justify-between items-end mt-6 md:mt-0">
               {/* Setting at top right */}
               <div className="flex gap-4">
-                <button className="rounded-full border-2 border-blue-500 p-3 text-blue-600 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center">
-                  <Settings size={18} className="mr-2" />
-                  <span className="font-medium">Setting</span>
-                </button>
-                <button className="rounded-full border-2 border-blue-500 p-3 text-blue-600 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center">
-                  <Bell size={18} className="mr-2" />
-                  <span className="font-medium text-xs">Notification Settings</span>
+                <button className="rounded-full p-2 text-blue-600 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center"
+                onClick={navigateToSettings}
+                >
+                  <Uisetting className="w-8 h-8" />
                 </button>
               </div>
               
