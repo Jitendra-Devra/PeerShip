@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import "./styles.css";
 
 const App = () => {
@@ -19,6 +20,12 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/profile/settings/*" element={<SettingsPage />} />
+      {/* Redirect to account settings by default */}
+      <Route
+        path="/profile/settings"
+        element={<Navigate to="/profile/settings/account" />}
+      />
     </Routes>
   );
 };
