@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import "./styles.css";
+import ExploreDeliveries from "./components/ExploreDeliveries";
 
 const App = () => {
   const location = useLocation();
@@ -26,6 +27,8 @@ const App = () => {
         path="/profile/settings"
         element={<Navigate to="/profile/settings/account" />}
       />
+            <Route path="/explore" element={<ExploreDeliveries/>}/>
+
     </Routes>
   );
 };

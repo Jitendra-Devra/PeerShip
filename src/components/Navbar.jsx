@@ -32,7 +32,7 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
         className="ml-0"
       >
         <Link
-          to="/"
+          href="/"
           onClick={(e) => {
             e.preventDefault(); // Prevent default behavior
             window.location.href = "/"; // Redirect to home
@@ -47,7 +47,7 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
       {/* Rightmost Side - Menu Items */}
       <div className="hidden lg:flex items-center space-x-6 mr-0">
         <Link
-          href="/explore"
+          to="/explore"
           className="text-white/90 py-2 hover:text-white transition-colors border-b-2 border-transparent hover:border-white"
         >
           Explore Deliveries
@@ -164,7 +164,7 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
           >
             <div className="px-4 pt-2 pb-3 space-y-1 text-center">
               <Link
-                href="/explore"
+                to="/explore"
                 className="block px-3 py-2 text-white/90 hover:text-white transition-colors border-b-2 border-transparent hover:border-white"
               >
                 Explore Deliveries
