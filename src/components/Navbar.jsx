@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Ensure you have react-router-dom installed
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -23,24 +22,6 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
     setIsLoggedIn(false);
   };
 
-  const smoothScrollToTop = () => {
-    const scrollDuration = 800; // Duration in milliseconds (increase to slow down)
-    const start = window.scrollY;
-    const startTime = performance.now();
-
-    const scrollStep = (timestamp) => {
-      const currentTime = timestamp - startTime;
-      const progress = Math.min(currentTime / scrollDuration, 1);
-      window.scrollTo(0, start * (1 - progress));
-
-      if (progress < 1) {
-        requestAnimationFrame(scrollStep);
-      }
-    };
-
-    requestAnimationFrame(scrollStep);
-  };
-
   return (
     <nav className="fixed flex justify-between items-center top-0 w-full bg-gradient-to-r from-blue-900/95 via-blue-800/95 to-blue-900/95 backdrop-blur-md z-50 border-b border-white/10 px-6 py-2">
       {/* Leftmost Side - PeerShip */}
@@ -51,10 +32,10 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
         className="ml-0"
       >
         <Link
-          href="/"
+          to="/"
           onClick={(e) => {
-            e.preventDefault(); // Prevent default link behavior
-            smoothScrollToTop(); // Scroll to top
+            e.preventDefault(); // Prevent default behavior
+            window.location.href = "/"; // Redirect to home
           }}
           className="text-lg font-bold bg-white rounded-xl px-3 py-2"
         >
@@ -78,11 +59,11 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
           Post a Delivery
         </Link>
         <Link
-          onClick={() =>
-            document
-              .getElementById("about")
-              .scrollIntoView({ behavior: "smooth" })
-          }
+          to="/#about"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+          }}
           className="text-white/90 py-2 hover:text-white transition-colors border-b-2 border-transparent hover:border-white"
         >
           About Us
