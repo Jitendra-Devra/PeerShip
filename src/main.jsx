@@ -5,6 +5,9 @@ import './index.css';
 import App from './App.jsx';
 import { BrowserRouter } from 'react-router-dom'
 import './styles.css';
+import connectDB from './databases/dbConnect.js'
+
+connectDB();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
