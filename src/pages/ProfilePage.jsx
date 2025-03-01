@@ -22,8 +22,22 @@ const ProfilePage = () => {
     ? "min-h-screen bg-gray-900 text-white" 
     : "min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50";
 
-  const navigateToSettings = ()=>{
+  const navigateToSettings = () => {
     navigate("/profile/settings");
+  };
+  
+  // Function to handle Edit Profile button click
+  const handleEditProfile = () => {
+    navigate("/profile/settings/account");
+  };
+  
+  // Function to handle Sign Out button click
+  const handleSignOut = () => {
+    // For testing: In a real app, you would clear authentication state here
+    // localStorage.removeItem("token"); // Example of removing auth token
+    
+    // Redirect to home page
+    navigate("/");
   };
 
   return (
@@ -71,25 +85,31 @@ const ProfilePage = () => {
                 </div>
               </div>
               
-              {/* Profile Details to right of image */}
-              <div className="flex flex-col justify-center mt-6 md:mt-0">
-                <div className="flex items-center justify-between">
+              {/* Main content area with profile info and edit button */}
+              <div className="flex flex-col md:flex-row gap-6 mt-6 md:mt-0 w-full">
+                {/* Profile Details in separate div */}
+                <div className="flex flex-col justify-center">
                   <h2 className="text-xl font-semibold text-gray-800">Name- {profileData.name}</h2>
                   
-                  {/* Edit Profile Button next to name */}
-                  <button className="bg-white border-2 border-blue-500 text-blue-600 rounded-lg py-2 px-6 ml-6 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center">
-                    <User size={16} className="mr-2" /> Edit Profile
+                  <div className="flex items-center mt-4">
+                    <Mail size={18} className="text-blue-500 mr-2" />
+                    <p className="text-gray-700">Email- {profileData.email}</p>
+                  </div>
+                  
+                  <div className="flex items-center mt-3">
+                    <Phone size={18} className="text-blue-500 mr-2" />
+                    <p className="text-gray-700">Phone number- {profileData.phone}</p>
+                  </div>
+                </div>
+                
+                {/* Edit Profile Button in separate div */}
+                <div className="flex items-start mt-2 md:mt-0 md:ml-auto">
+                  <button 
+                    className="bg-white border border-blue-500 text-blue-600 rounded-md py-1 px-3 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center text-sm"
+                    onClick={handleEditProfile}
+                  >
+                    <User size={14} className="mr-1" /> Edit
                   </button>
-                </div>
-                
-                <div className="flex items-center mt-4">
-                  <Mail size={18} className="text-blue-500 mr-2" />
-                  <p className="text-gray-700">Email- {profileData.email}</p>
-                </div>
-                
-                <div className="flex items-center mt-3">
-                  <Phone size={18} className="text-blue-500 mr-2" />
-                  <p className="text-gray-700">Phone number- {profileData.phone}</p>
                 </div>
               </div>
             </div>
@@ -98,15 +118,19 @@ const ProfilePage = () => {
             <div className="flex flex-col justify-between items-end mt-6 md:mt-0">
               {/* Setting at top right */}
               <div className="flex gap-4">
-                <button className="rounded-full p-2 text-blue-600 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center"
-                onClick={navigateToSettings}
+                <button 
+                  className="rounded-full p-2 text-blue-600 hover:bg-blue-50 transition-colors duration-300 shadow-sm flex items-center"
+                  onClick={navigateToSettings}
                 >
                   <Uisetting className="w-8 h-8" />
                 </button>
               </div>
               
-              {/* Sign Out at bottom right */}
-              <button className="bg-red-500 text-white rounded-lg py-2 px-8 w-40 hover:bg-red-600 transition-colors duration-300 shadow-md flex items-center justify-center mt-4 md:mt-0">
+              {/* Sign Out at bottom right - Updated with onClick handler */}
+              <button 
+                className="bg-red-500 text-white rounded-lg py-2 px-8 w-40 hover:bg-red-600 transition-colors duration-300 shadow-md flex items-center justify-center mt-4 md:mt-0"
+                onClick={handleSignOut}
+              >
                 <LogOut size={18} className="mr-2" /> Sign out
               </button>
             </div>
