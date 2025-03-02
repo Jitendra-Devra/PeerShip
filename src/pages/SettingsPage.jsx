@@ -79,8 +79,8 @@ const SettingsPage = () => {
       {/* Navbar */}
       <Navbar />
       
-      {/* Settings Tabs - positioned right below navbar */}
-      <div className="w-full pt-14 bg-white shadow-md border-b border-blue-100">
+      {/* Settings Tabs - made sticky with fixed positioning */}
+      <div className="w-full fixed top-14 z-10 bg-white shadow-md border-b border-blue-100">
         <div className="container mx-auto px-6">
           <div className="flex flex-wrap justify-between items-center">
             <div className="flex-1 overflow-x-auto px-2">
@@ -112,49 +112,8 @@ const SettingsPage = () => {
         </div>
       </div>
       
-      {/* Main content */}
-      <div className="container mx-auto px-6 py-6">
-        {/* Profile Information */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-blue-100">
-          <div className="flex flex-col md:flex-row">
-            <div className="flex flex-col md:flex-row items-start gap-8">
-              {/* Profile Image */}
-              <div className="flex flex-col items-center">
-                <div className="relative w-32 h-32">
-                  <img 
-                    src={profileData.profileImage} 
-                    alt="Profile" 
-                    className="w-full h-full rounded-full object-cover border-4 border-blue-500 shadow-md" 
-                  />
-                  <button className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full shadow-md hover:bg-blue-600 transition-colors duration-300">
-                    <Camera size={16} />
-                  </button>
-                </div>
-              </div>
-              
-              {/* Profile Details */}
-              <div className="flex flex-col justify-center mt-6 md:mt-0">
-                <div className="flex items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">Name: {profileData.name}</h2>
-                  <button 
-                    className="ml-4 text-blue-600 hover:text-blue-800"
-                    onClick={() => navigate("/profile/settings/account")}
-                  >Edit</button>
-                </div>
-                
-                <div className="flex items-center mt-2 mb-2">
-                  <Phone size={18} className="text-blue-500 mr-2" />
-                  <p className="text-gray-700">Phone Number: {profileData.phone}</p>
-                </div>
-                
-                <div className="flex items-center mt-2">
-                  <Mail size={18} className="text-blue-500 mr-2" />
-                  <p className="text-gray-700">Email: {profileData.email}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Add padding to account for the fixed navbar and tabs */}
+      <div className="pt-28 container mx-auto px-6 py-6">
       
         {/* Content Area - This is where the different settings components will render */}
         <div className="mb-8">
