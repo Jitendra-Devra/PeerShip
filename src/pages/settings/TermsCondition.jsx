@@ -325,7 +325,7 @@ const TermsCondition = () => {
         <p className="mt-6 text-sm text-gray-600">
           For questions about these Terms, please contact us at:
           <br />
-          Email: support@peership.com
+          Email: jitendradevra01@gmail.com
           <br />
           Last updated: March 1, 2025
         </p>

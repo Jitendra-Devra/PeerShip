@@ -48,6 +48,30 @@ const VehicleType = () => {
       
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Bike Option */}
+          <div 
+            className={`border-2 ${selectedVehicle === "bike" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"} rounded-xl p-6 flex flex-col items-center transition-all duration-300 cursor-pointer shadow-sm hover:shadow`}
+            onClick={() => handleVehicleSelect("bike")}
+          >
+            <div className={`${selectedVehicle === "bike" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"} p-3 rounded-full mb-4 transition-colors duration-300`}>
+              <Bike size={32} />
+            </div>
+            <h3 className="text-lg font-medium text-gray-800 mb-2">Bike</h3>
+            <p className="text-sm text-gray-600 text-center mb-4">Perfect for small packages and quick local deliveries.</p>
+            {selectedVehicle === "bike" ? (
+              <div className="bg-blue-500 text-white px-3 py-1 rounded-full flex items-center">
+                <Check size={16} className="mr-1" /> Selected
+              </div>
+            ) : (
+              <button 
+                className="text-blue-600 border border-blue-600 px-3 py-1 rounded-full hover:bg-blue-600 hover:text-white transition-colors duration-300"
+                onClick={() => handleVehicleSelect("bike")}
+              >
+                Select
+              </button>
+            )}
+          </div>
+          
           {/* Car Option */}
           <div 
             className={`border-2 ${selectedVehicle === "car" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"} rounded-xl p-6 flex flex-col items-center transition-all duration-300 cursor-pointer shadow-sm hover:shadow`}
@@ -80,7 +104,7 @@ const VehicleType = () => {
             <div className={`${selectedVehicle === "truck" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"} p-3 rounded-full mb-4 transition-colors duration-300`}>
               <Truck size={32} />
             </div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">Truck</h3>
+            <h3 className="text-lg font-medium text-gray-800 mb-2">Truck/Large Vehicles</h3>
             <p className="text-sm text-gray-600 text-center mb-4">Ideal for large packages and long-distance deliveries.</p>
             {selectedVehicle === "truck" ? (
               <div className="bg-blue-500 text-white px-3 py-1 rounded-full flex items-center">
@@ -96,29 +120,7 @@ const VehicleType = () => {
             )}
           </div>
           
-          {/* Bike Option */}
-          <div 
-            className={`border-2 ${selectedVehicle === "bike" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"} rounded-xl p-6 flex flex-col items-center transition-all duration-300 cursor-pointer shadow-sm hover:shadow`}
-            onClick={() => handleVehicleSelect("bike")}
-          >
-            <div className={`${selectedVehicle === "bike" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"} p-3 rounded-full mb-4 transition-colors duration-300`}>
-              <Bike size={32} />
-            </div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">Bike</h3>
-            <p className="text-sm text-gray-600 text-center mb-4">Perfect for small packages and quick local deliveries.</p>
-            {selectedVehicle === "bike" ? (
-              <div className="bg-blue-500 text-white px-3 py-1 rounded-full flex items-center">
-                <Check size={16} className="mr-1" /> Selected
-              </div>
-            ) : (
-              <button 
-                className="text-blue-600 border border-blue-600 px-3 py-1 rounded-full hover:bg-blue-600 hover:text-white transition-colors duration-300"
-                onClick={() => handleVehicleSelect("bike")}
-              >
-                Select
-              </button>
-            )}
-          </div>
+          
         </div>
         
         {/* Vehicle Details Form */}

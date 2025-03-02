@@ -23,6 +23,9 @@ const VerifyPartner = () => {
             <li className="flex items-center text-gray-700">
               <Check size={16} className="text-green-500 mr-2" /> Proof of Insurance
             </li>
+            <li className="flex items-center text-gray-700">
+              <Check size={16} className="text-green-500 mr-2" /> Background Check Consent Form
+            </li>
           </ul>
         </div>
         
@@ -51,6 +54,16 @@ const VerifyPartner = () => {
           <div className="border border-dashed border-blue-300 rounded-lg p-6 flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 transition-colors duration-300">
             <Upload size={32} className="text-blue-500 mb-4" />
             <p className="text-sm text-gray-600 text-center mb-2">Upload Proof of Insurance</p>
+            <label className="bg-blue-600 text-white rounded-lg px-4 py-2 cursor-pointer hover:bg-blue-700 transition-colors duration-300">
+              Choose File
+              <input type="file" className="hidden" />
+            </label>
+          </div>
+          
+          {/* Background Check Consent Form */}
+          <div className="border border-dashed border-blue-300 rounded-lg p-6 flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 transition-colors duration-300">
+            <Upload size={32} className="text-blue-500 mb-4" />
+            <p className="text-sm text-gray-600 text-center mb-2">Upload Background Check Consent</p>
             <label className="bg-blue-600 text-white rounded-lg px-4 py-2 cursor-pointer hover:bg-blue-700 transition-colors duration-300">
               Choose File
               <input type="file" className="hidden" />
