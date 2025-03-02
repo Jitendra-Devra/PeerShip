@@ -5,6 +5,7 @@ import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import "./styles.css";
 import ExploreDeliveries from "./components/ExploreDeliveries";
+import PostDeliveries from "./components/PostDeliveries";
 
 const App = () => {
   const location = useLocation();
@@ -25,10 +26,9 @@ const App = () => {
       {/* Redirect to account settings by default */}
       <Route
         path="/profile/settings"
-        element={<Navigate to="/profile/settings/account" />}
-      />
-            <Route path="/explore" element={<ExploreDeliveries/>}/>
-
+        element={<Navigate to="/profile/settings/account" />}/>
+      <Route path="/explore" element={<ExploreDeliveries/>}/>
+      <Route path="/post" element={<PostDeliveries/>} />
     </Routes>
   );
 };

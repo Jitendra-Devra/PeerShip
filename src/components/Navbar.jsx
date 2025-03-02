@@ -53,7 +53,7 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
           Explore Deliveries
         </Link>
         <Link
-          href="/post"
+          to="/post"
           className="text-white/90 py-2 hover:text-white transition-colors border-b-2 border-transparent hover:border-white"
         >
           Post a Delivery
@@ -170,7 +170,7 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
                 Explore Deliveries
               </Link>
               <Link
-                href="/post"
+                to="/post"
                 className="block px-3 py-2 text-white/90 hover:text-white transition-colors border-b-2 border-transparent hover:border-white"
               >
                 Post a Delivery
