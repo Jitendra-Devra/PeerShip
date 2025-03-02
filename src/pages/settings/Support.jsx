@@ -345,7 +345,7 @@ const Support = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="border p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 bg-white">
             <h3 className="font-medium text-lg mb-2 text-blue-700">Email</h3>
-            <p>support@peership.com</p>
+            <p>jitendradevra01@gmail.com</p>
           </div>
           <div className="border p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 bg-white">
             <h3 className="font-medium text-lg mb-2 text-blue-700">Live Chat</h3>
