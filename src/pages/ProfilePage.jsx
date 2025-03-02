@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, LogOut, Mail, Phone, Moon, Sun, Camera, Shield, DollarSign, History, Package, Truck, Settings, Bell } from "lucide-react";
+import { User, LogOut, Mail, Phone, Moon, Sun, Camera, Shield, DollarSign, History, Package, Truck, Settings, Bell, X } from "lucide-react";
 import { Uisetting } from "../components/ui/Icons.jsx"; 
 import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
@@ -7,12 +7,13 @@ import { useNavigate } from "react-router-dom";
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
+  const [showProfileImageModal, setShowProfileImageModal] = useState(false);
   const [profileData] = useState({
     name: "Alex Johnson",
     email: "alex.johnson@example.com",
     phone: "+1 (555) 123-4567",
     isVerified: true,
-    profileImage: "/api/placeholder/150/150",
+    profileImage: "https://randomuser.me/api/portraits/men/34.jpg",
     walletBalance: "$132.40",
   });
 
@@ -40,6 +41,11 @@ const ProfilePage = () => {
     navigate("/");
   };
 
+  // Function to toggle profile image modal
+  const toggleProfileImageModal = () => {
+    setShowProfileImageModal(!showProfileImageModal);
+  };
+
   return (
     <div className={containerClass}>
       <Navbar />
@@ -65,7 +71,12 @@ const ProfilePage = () => {
               {/* Profile Image */}
               <div className="flex flex-col items-center">
                 <div className="relative w-48 h-48">
-                  <img src={profileData.profileImage} alt="Profile" className="w-full h-full rounded-full object-cover border-4 border-blue-500 shadow-md" />
+                  <img 
+                    src={profileData.profileImage} 
+                    alt="Profile" 
+                    className="w-full h-full rounded-full object-cover border-4 border-blue-500 shadow-md cursor-pointer" 
+                    onClick={toggleProfileImageModal}
+                  />
                   <button className="absolute bottom-2 right-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-2 rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
                     <Camera size={16} />
                   </button>
@@ -192,6 +203,27 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+
+      {/* Profile Image Modal */}
+      {showProfileImageModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" onClick={toggleProfileImageModal}>
+          <div className="relative max-w-3xl max-h-screen p-4">
+            <button 
+              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70 transition-all duration-300"
+              onClick={toggleProfileImageModal}
+            >
+              <X size={24} />
+            </button>
+            <img 
+              src={profileData.profileImage} 
+              alt="Profile" 
+              className="max-w-full max-h-screen rounded-lg shadow-2xl"
+              style={{ objectFit: 'contain' }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
