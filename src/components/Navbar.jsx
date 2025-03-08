@@ -1,25 +1,48 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Ensure you have react-router-dom installed
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom"; // Ensure you have react-router-dom installed
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "../components/ui/Button"; // Adjust path as needed
 import { Uiprofile } from "./ui/Icons"; // Import the profile icon
 
 const Navbar = ({ onSignInClick, onSignUpClick }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  // Add this state to track login status (for frontend testing)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // For testing purposes - toggle login state when clicking Sign In
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      setIsLoggedIn(!!token && !!user);
+    };
+
+    // Check initially
+    checkAuth();
+
+    // Listen for auth changes
+    window.addEventListener('auth-change', checkAuth);
+    // Listen for storage changes
+    window.addEventListener('storage', checkAuth);
+
+    return () => {
+      window.removeEventListener('auth-change', checkAuth);
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, []);
+
   const handleSignIn = () => {
-    setIsLoggedIn(true);
-    // You can still call the original onSignInClick if needed
     if (onSignInClick) onSignInClick();
   };
 
-  // For testing purposes - log out
   const handleSignOut = () => {
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setIsLoggedIn(false);
+    
+    // Redirect to home page
+    navigate('/');
   };
 
   return (
@@ -68,27 +91,12 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
         >
           About Us
         </Link>
-        <Link
-          href="/terms"
-          className="text-white/90 py-2 hover:text-white transition-colors border-b-2 border-transparent hover:border-white"
-        >
-          Terms & Conditions
-        </Link>
 
         {/* Conditional rendering based on login status */}
         {isLoggedIn ? (
           // Show these when logged in
           <>
-            <button
-              onClick={() => (window.location.href = "/profile")}
-              
-              className="relative inline-flex items-center justify-center p-auto font-semibold leading-4 cursor-pointer rounded-xl transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 border border-transparent hover:border-teal-500"
-            >
-              <div className="relative z-10 flex items-center justify-center space-x-2">
-                <Uiprofile className="w-8 h-8" />
-              </div>
-            </button>
-            <Button
+              <Button
               onClick={() => (window.location.href = "/dashboard")}
               variant="outline"
               className="relative inline-block p-px font-semibold leading-4 bg-white border-[2px] cursor-pointer rounded-xl transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 border border-transparent hover:border-teal-500"
@@ -99,17 +107,16 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
                 </span>
               </div>
             </Button>
-            <Button
-              onClick={handleSignOut}
-              variant="outline"
-              className="relative inline-block p-px font-semibold leading-4 bg-white border-[2px] cursor-pointer rounded-xl transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 border border-transparent hover:border-teal-500"
+            <button
+              onClick={() => (window.location.href = "/profile")}
+              
+              className="relative inline-flex items-center justify-center p-auto font-semibold leading-4 cursor-pointer rounded-xl transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 border border-transparent hover:border-teal-500"
             >
               <div className="relative z-10 flex items-center justify-center space-x-2">
-                <span className="transition-all text-[#007BFF] duration-500 group-hover:translate-x-1">
-                  Sign Out
-                </span>
+                <Uiprofile className="w-8 h-8" />
               </div>
-            </Button>
+            </button>
+            
           </>
         ) : (
           // Show these when logged out
@@ -176,16 +183,10 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
                 Post a Delivery
               </Link>
               <Link
-                href="/terms"
+                href="/About"
                 className="block px-3 py-2 text-white/90 hover:text-white transition-colors border-b-2 border-transparent hover:border-white"
               >
                 About Us
-              </Link>
-              <Link
-                href="/terms"
-                className="block px-3 py-2 text-white/90 hover:text-white transition-colors border-b-2 border-transparent hover:border-white"
-              >
-                Terms & Conditions
               </Link>
 
               <div className="space-y-2 pt-2">
@@ -206,12 +207,6 @@ const Navbar = ({ onSignInClick, onSignUpClick }) => {
                       className="w-full border-white text-white hover:bg-white hover:text-blue-900 border-b-2 border-transparent hover:border-white"
                     >
                       Dashboard
-                    </Button>
-                    <Button
-                      onClick={handleSignOut}
-                      className="w-full bg-[#28A745] hover:bg-[#28A745]/90 text-white shadow-lg hover:shadow-[#28A745]/25"
-                    >
-                      Sign Out
                     </Button>
                   </>
                 ) : (
