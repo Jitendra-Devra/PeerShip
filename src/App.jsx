@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
-import ResetPasswordForm from "./components/ResetPassword";
+import "./styles.css";
 import ExploreDeliveries from "./components/ExploreDeliveries";
 import PostDeliveries from "./components/PostDeliveries";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -60,7 +60,7 @@ const App = () => {
 
       {/* Auth routes */}
       <Route path="/reset-password" element={<ResetPasswordForm />} />
-    </Routes>
+    <Routes>
     </ToastProvider>
   );
 };

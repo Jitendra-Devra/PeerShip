@@ -1,45 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
-import { useToast } from '../context/ToastContext';
-
+import React, { useState } from 'react';
 
 const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) => {
-  const { showToast } = useToast();
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
-  
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    // Check URL for token parameter (from Google OAuth redirect)
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    
-    if (token) {
-      // Store token and redirect
-      localStorage.setItem('token', token);
-      
-      // Try to decode token to get user info
-      try {
-        const decoded = jwtDecode(token);
-        localStorage.setItem('user', JSON.stringify({ id: decoded.id, email: decoded.email }));
-      } catch (error) {
-        console.error('Error decoding token:', error);
-      }
-      
-      // Clean URL and redirect
-      window.history.replaceState({}, document.title, window.location.pathname);
-      navigate('/');
-      window.location.reload();
-    }
-  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -51,93 +17,10 @@ const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) =>
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError(''); // Clear previous errors
-    setIsLoading(true);
-    
-    try {
-      // Make API call to your backend authentication endpoint
-      const response = await fetch('http://localhost:5000/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
-        credentials: 'include', // Include cookies for session-based auth
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        // Store user data in localStorage or sessionStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        // If remember me is checked, set a longer expiration
-        if (formData.rememberMe) {
-          localStorage.setItem('rememberMe', 'true');
-        }
-        
-        // Close the modal and redirect or refresh page
-        onClose();
-        showToast(`Welcome back, ${data.username}!`);
-        navigate('/');
-        window.dispatchEvent(new Event('auth-change'));
-      } else {
-        // Handle authentication errors
-        setError(data.message || 'Invalid email or password');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('Network error occurred. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle Google login success
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/google-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          credential: credentialResponse.credential
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        onClose();
-        showToast(`Welcome back, ${data.user.username}!`);
-        navigate('/');
-        window.dispatchEvent(new Event('auth-change'));
-      } else {
-        setError(data.message || 'Google authentication failed');
-      }
-    } catch (error) {
-      console.error('Google login error:', error);
-      setError('Error during Google authentication');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle Google login failure
-  const handleGoogleFailure = (error) => {
-    console.error('Google login failed:', error);
-    setError('Google authentication failed. Please try again.');
+    // Implement your authentication logic here
+    console.log('Form submitted:', formData);
   };
 
   if (!isOpen) return null;
@@ -146,7 +29,7 @@ const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) =>
     <div className="fixed inset-0 bg-transparent bg-opacity-30 h-screen backdrop-blur-sm z-[50] flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full my-auto max-h-[85vh] overflow-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 h-full">
-          {/* Left side with image */}
+          {/* Left side with image - now takes up 1/2 of the space */}
           <div className="ml-3 border border-2 border-blue-800 rounded-lg max-md:order-1 md:h-[500px] w-full bg-[#FFFFFF] md:rounded-tl-xl md:rounded-bl-xl p-8">
             <img 
               src="/Site_Logo_removebg_preview.png" 
@@ -155,7 +38,7 @@ const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) =>
             />
           </div>
 
-          {/* Right side with form */}
+          {/* Right side with form - now takes up 1/2 of the space */}
           <div className="w-full p-6 relative">
             {/* Close button */}
             <button 
@@ -182,13 +65,6 @@ const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) =>
                   </button>
                 </p>
               </div>
-
-              {/* Display error message if exists */}
-              {error && (
-                <div className="mb-4 p-3 text-sm bg-red-50 text-red-800 border border-red-200 rounded-md">
-                  {error}
-                </div>
-              )}
 
               <div>
                 <label htmlFor="email" className="text-gray-800 text-[15px] mb-2 block">Email</label>
@@ -259,7 +135,7 @@ const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) =>
                 <div>
                   <button 
                     type="button"
-                    onClick={onForgotPassword}
+                    onClick={onForgotPassword} // Add onClick handler here
                     className="text-blue-600 font-semibold text-sm hover:underline"
                   >
                     Forgot Password?
@@ -270,10 +146,9 @@ const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) =>
               <div className="mt-8">
                 <button 
                   type="submit" 
-                  disabled={isLoading}
-                  className={`w-full py-3 px-4 text-sm tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className="w-full py-3 px-4 text-sm tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
                 >
-                  {isLoading ? 'Signing in...' : 'Sign in'}
+                  Sign in
                 </button>
               </div>
 
@@ -283,17 +158,32 @@ const SignInModal = ({ isOpen, onClose, onSwitchToSignUp, onForgotPassword }) =>
                 <hr className="w-full border-gray-300" />
               </div>
 
-              {/* Google Login Button */}
-              <div className="flex justify-center">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleFailure}
-                  theme="outline"
-                  size="large"
-                  text="signin_with"
-                  shape="rectangular"
-                />
-              </div>
+              <button 
+                type="button" 
+                className="w-full flex items-center justify-center gap-4 py-3 px-6 text-sm tracking-wide text-gray-800 border border-gray-300 rounded-md bg-gray-50 hover:bg-gray-100 focus:outline-none"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20px" className="inline" viewBox="0 0 512 512">
+                  <path fill="#fbbd00"
+                    d="M120 256c0-25.367 6.989-49.13 19.131-69.477v-86.308H52.823C18.568 144.703 0 198.922 0 256s18.568 111.297 52.823 155.785h86.308v-86.308C126.989 305.13 120 281.367 120 256z"
+                    data-original="#fbbd00" />
+                  <path fill="#0f9d58"
+                    d="m256 392-60 60 60 60c57.079 0 111.297-18.568 155.785-52.823v-86.216h-86.216C305.044 385.147 281.181 392 256 392z"
+                    data-original="#0f9d58" />
+                  <path fill="#31aa52"
+                    d="m139.131 325.477-86.308 86.308a260.085 260.085 0 0 0 22.158 25.235C123.333 485.371 187.62 512 256 512V392c-49.624 0-93.117-26.72-116.869-66.523z"
+                    data-original="#31aa52" />
+                  <path fill="#3c79e6"
+                    d="M512 256a258.24 258.24 0 0 0-4.192-46.377l-2.251-12.299H256v120h121.452a135.385 135.385 0 0 1-51.884 55.638l86.216 86.216a260.085 260.085 0 0 0 25.235-22.158C485.371 388.667 512 324.38 512 256z"
+                    data-original="#3c79e6" />
+                  <path fill="#cf2d48"
+                    d="m352.167 159.833 10.606 10.606 84.853-84.852-10.606-10.606C388.668 26.629 324.381 0 256 0l-60 60 60 60c36.326 0 70.479 14.146 96.167 39.833z"
+                    data-original="#cf2d48" />
+                  <path fill="#eb4132"
+                    d="M256 120V0C187.62 0 123.333 26.629 74.98 74.98a259.849 259.849 0 0 0-22.158 25.235l86.308 86.308C162.883 146.72 206.376 120 256 120z"
+                    data-original="#eb4132" />
+                </svg>
+                Continue with Google
+              </button>
             </form>
           </div>
         </div>
