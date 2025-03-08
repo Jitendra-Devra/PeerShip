@@ -7,6 +7,7 @@ import ResetPasswordForm from "./components/ResetPassword";
 import ExploreDeliveries from "./components/ExploreDeliveries";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastProvider } from "./context/ToastContext";
+import PostDeliveries from "./components/PostDeliveries";
 
 const App = () => {
   const location = useLocation();
