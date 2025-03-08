@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
-import "./styles.css";
+import ResetPasswordForm from "./components/ResetPassword";
 import ExploreDeliveries from "./components/ExploreDeliveries";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { ToastProvider } from "./context/ToastContext";
 
 const App = () => {
   const location = useLocation();
@@ -18,18 +20,45 @@ const App = () => {
     }
   }, [location]);
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/profile/settings/*" element={<SettingsPage />} />
+    <ToastProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/settings/*"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/explore"
+          element={
+            <ProtectedRoute>
+              <ExploreDeliveries />
+            </ProtectedRoute>
+          }
+      />
+
+      {/* Auth routes */}
+      <Route path="/reset-password" element={<ResetPasswordForm />} />
+
       {/* Redirect to account settings by default */}
       <Route
         path="/profile/settings"
         element={<Navigate to="/profile/settings/account" />}
       />
-            <Route path="/explore" element={<ExploreDeliveries/>}/>
 
     </Routes>
+    </ToastProvider>
   );
 };
 

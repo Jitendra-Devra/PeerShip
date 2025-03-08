@@ -8,29 +8,49 @@ const ForgotPasswordForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setMessage({ type: '', text: '' });
     
     try {
-      // Replace with your API call
-      // const response = await api.post('/auth/forgot-password', { email });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setMessage({
-        type: 'success',
-        text: `Password reset link has been sent to ${email}`
+      // Real API call to your backend
+      const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+        credentials: 'include'
       });
-      setEmail('');
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMessage({
+          type: 'success',
+          text: data.message || 'If an account exists with this email, you will receive password reset instructions.'
+        });
+        setEmail('');
+      } else {
+        // Handle specific error cases
+        if (data.message && data.message.includes('Google authentication')) {
+          setMessage({
+            type: 'error',
+            text: 'This email is registered with Google. Please use Google Sign In.'
+          });
+        } else {
+          throw new Error(data.message || 'Failed to process request');
+        }
+      }
     } catch (error) {
+      console.error('Forgot password error details:', error); // More detailed error logging
       setMessage({
         type: 'error',
-        text: error.message || 'Failed to send reset link. Please try again.'
+        text: error.message || 'An error occurred while processing your request. Please try again later.'
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
+  
   return (
     <div className="w-full mx-auto">
       <div className="bg-white rounded-lg">
@@ -71,8 +91,6 @@ const ForgotPasswordForm = () => {
           >
             {isSubmitting ? 'Sending...' : 'Send Reset Link'}
           </button>
-          
-          {/* Removed "Back to Login" link as it's now handled at the Home component level */}
         </form>
       </div>
     </div>
