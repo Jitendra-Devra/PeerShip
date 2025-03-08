@@ -54,9 +54,9 @@ const App = () => {
       {/* Redirect to account settings by default */}
       <Route
         path="/profile/settings"
-        element={<Navigate to="/profile/settings/account" />}
-      />
-
+        element={<Navigate to="/profile/settings/account" />}/>
+      <Route path="/explore" element={<ExploreDeliveries/>}/>
+      <Route path="/post" element={<PostDeliveries/>} />
     </Routes>
     </ToastProvider>
   );
