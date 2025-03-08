@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+// src/components/auth/ResetPasswordForm.jsx
+import React, { useState } from 'react';
 
 const ResetPasswordForm = () => {
   const [formData, setFormData] = useState({
@@ -8,24 +8,6 @@ const ResetPasswordForm = () => {
   });
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [token, setToken] = useState('');
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Extract token from URL on component mount
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const tokenFromUrl = searchParams.get('token');
-    if (tokenFromUrl) {
-      setToken(tokenFromUrl);
-    } else {
-      // Redirect if no token is found
-      setMessage({
-        type: 'error',
-        text: 'Invalid or missing reset token. Please request a new password reset link.'
-      });
-    }
-  }, [location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,34 +42,21 @@ const ResetPasswordForm = () => {
     setIsSubmitting(true);
     
     try {
-      // Real API call to your backend
-      const response = await fetch('http://localhost:5000/api/auth/reset-password', { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          token, 
-          newPassword: formData.newPassword 
-        })
+      // Replace with your API call
+      // const token = new URLSearchParams(window.location.search).get('token');
+      // const response = await api.post('/auth/reset-password', { 
+      //   token, 
+      //   password: formData.newPassword 
+      // });
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setMessage({
+        type: 'success',
+        text: 'Your password has been reset successfully'
       });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        setMessage({
-          type: 'success',
-          text: 'Your password has been reset successfully'
-        });
-        setFormData({ newPassword: '', confirmPassword: '' });
-        
-        // Redirect to home page after 3 seconds
-        setTimeout(() => {
-          navigate('/');
-        }, 3000);
-      } else {
-        throw new Error(data.message || 'Failed to reset password');
-      }
+      setFormData({ newPassword: '', confirmPassword: '' });
     } catch (error) {
       setMessage({
         type: 'error',
@@ -154,16 +123,16 @@ const ResetPasswordForm = () => {
           
           <button
             type="submit"
-            disabled={isSubmitting || !token}
+            disabled={isSubmitting}
             className={`w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium 
-              ${(isSubmitting || !token) ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}
+              ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}
               transition duration-200`}
           >
             {isSubmitting ? 'Resetting...' : 'Reset Password'}
           </button>
           
           <div className="mt-4 text-center">
-            <a href="/" className="text-blue-600 hover:underline text-sm">
+            <a href="/login" className="text-blue-600 hover:underline text-sm">
               Cancel
             </a>
           </div>
