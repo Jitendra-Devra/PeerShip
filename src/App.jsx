@@ -5,9 +5,10 @@ import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import ResetPasswordForm from "./components/ResetPassword";
 import ExploreDeliveries from "./components/ExploreDeliveries";
+import PostDeliveries from "./components/PostDeliveries";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastProvider } from "./context/ToastContext";
-import PostDeliveries from "./components/PostDeliveries";
+
 
 const App = () => {
   const location = useLocation();
@@ -48,16 +49,17 @@ const App = () => {
             </ProtectedRoute>
           }
       />
+      <Route
+          path="/post"
+          element={
+            <ProtectedRoute>
+              <PostDeliveries />
+            </ProtectedRoute>
+          }
+      />
 
       {/* Auth routes */}
       <Route path="/reset-password" element={<ResetPasswordForm />} />
-
-      {/* Redirect to account settings by default */}
-      <Route
-        path="/profile/settings"
-        element={<Navigate to="/profile/settings/account" />}/>
-      <Route path="/explore" element={<ExploreDeliveries/>}/>
-      <Route path="/post" element={<PostDeliveries/>} />
     </Routes>
     </ToastProvider>
   );
