@@ -25,7 +25,7 @@ import { motion } from "framer-motion";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(false);
+
   const [showProfileImageModal, setShowProfileImageModal] = useState(false);
   const [profileData] = useState({
     name: "Alex Johnson",
@@ -45,12 +45,6 @@ const ProfilePage = () => {
     ],
     referralCode: "ALEXJ2025",
   });
-
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-
-  const containerClass = darkMode
-    ? "min-h-screen bg-gray-900 text-white"
-    : "min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50";
 
   const navigateToSettings = () => {
     navigate("/profile/settings");
@@ -448,3 +442,4 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+z
