@@ -1,19 +1,14 @@
 import React, { useEffect } from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  useLocation,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
-import "./styles.css";
+import ResetPasswordForm from "./components/ResetPassword";
 import ExploreDeliveries from "./components/ExploreDeliveries";
 import PostDeliveries from "./components/PostDeliveries";
-
+import ProtectedRoute from "./components/ProtectedRoute";
+import { ToastProvider } from "./context/ToastContext";
 import TermsCondition from "./pages/settings/TermsCondition";
 import Support from './pages/settings/Support';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -32,25 +27,50 @@ const App = () => {
     }
   }, [location]);
   return (
+    <ToastProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/settings/*"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/explore"
+          element={
+            <ProtectedRoute>
+              <ExploreDeliveries />
+            </ProtectedRoute>
+          }
+      />
+      <Route
+          path="/post"
+          element={
+            <ProtectedRoute>
+              <PostDeliveries />
+            </ProtectedRoute>
+          }
+      />
+
     <Routes>
-      <Route path="/" element={<Home />} />
-      {/* Add a route for the terms page */}
       <Route path="/terms" element={<TermsCondition />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/Safety" element={<Safety/>}/>
-      <Route path="/support" element={<Support />} />
-
-
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/profile/settings/*" element={<SettingsPage />} />
-      {/* Redirect to account settings by default */}
-      <Route
-        path="/profile/settings"
-        element={<Navigate to="/profile/settings/account" />}
-      />
-      <Route path="/explore" element={<ExploreDeliveries />} />
-      <Route path="/post" element={<PostDeliveries />} />
+      <Route path="/support" element={<Support />} />        
+      <Route path="/reset-password" element={<ResetPasswordForm />} />
     </Routes>
+    </ToastProvider>
   );
 };
 

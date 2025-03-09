@@ -1,84 +1,111 @@
-import React, { useState } from "react";
-import {
-  User,
-  LogOut,
-  Mail,
-  Phone,
-  Moon,
-  Sun,
-  Camera,
-  Shield,
-  Star,
-  History,
-  Award,
-  Users,
-  Gift,
-  Settings,
-  Bell,
-  X,
-  AlertTriangle,
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { User, LogOut, Mail, Phone, Camera, Shield, IndianRupee, History, Package, Truck} from "lucide-react";
 import { Uisetting,Uistar } from "../components/ui/Icons.jsx";
 import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useToast } from '../context/ToastContext';
 
 const ProfilePage = () => {
+  const { showToast } = useToast();
+  const containerClass = "bg-gray-100 min-h-screen";
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(false);
-  const [showProfileImageModal, setShowProfileImageModal] = useState(false);
-  const [profileData] = useState({
-    name: "Alex Johnson",
-    email: "alex.johnson@example.com",
-    phone: "+1 (555) 123-4567",
-    isVerified: false, // Changed to false to demonstrate verification prompt
-    profileImage: "https://randomuser.me/api/portraits/men/34.jpg",
-    stats: {
-      totalDeliveries: 47,
-      averageRating: 4.8,
-      averageEarnings: "$32.50",
-    },
-    badges: [
-      { name: "Top Deliverer", month: "February" },
-      { name: "Perfect Rating", count: 10 },
-      { name: "Early Bird", description: "Always on time" },
-    ],
-    referralCode: "ALEXJ2025",
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [imageError, setImageError] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    isVerified: false,
+    profileImage: "https://ui-avatars.com/api/?background=random",
+    walletBalance: "₹0.00",
   });
-
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-
-  const containerClass = darkMode
-    ? "min-h-screen bg-gray-900 text-white"
-    : "min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50";
 
   const navigateToSettings = () => {
     navigate("/profile/settings");
   };
 
-  // Function to handle Edit Profile button click
   const handleEditProfile = () => {
     navigate("/profile/settings/account");
   };
 
-  // Function to handle Sign Out button click
-  const handleSignOut = () => {
-    // For testing: In a real app, you would clear authentication state here
-    // localStorage.removeItem("token"); // Example of removing auth token
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/');
+          return;
+        }
 
-    // Redirect to home page
+        const response = await fetch('http://localhost:5000/api/auth/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': Bearer ${token},
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile data');
+        }
+
+        const userData = await response.json();
+        
+        setProfileData({
+          name: userData.username || "User",
+          email: userData.email || "",
+          phone: userData.phone || "Not provided",
+          isVerified: userData.isVerified || false,
+          profileImage: userData.profilePicture || https://ui-avatars.com/api/?name=${encodeURIComponent(userData.username)}&background=random&size=200,
+          walletBalance: userData.walletBalance || "0.00",
+        });
+
+        setImageError(!userData.profilePicture);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        setError('Failed to load profile data');
+        setImageError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    showToast('Signed out successfully. Bye!'); 
     navigate("/");
   };
 
-  // Function to navigate to verification page
-  const navigateToVerification = () => {
-    navigate("/profile/settings/verify");
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
-  // Function to toggle profile image modal
-  const toggleProfileImageModal = () => {
-    setShowProfileImageModal(!showProfileImageModal);
-  };
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <p className="text-red-500 text-center">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Function to copy referral code to clipboard
   const copyReferralCode = () => {
@@ -124,27 +151,32 @@ const ProfilePage = () => {
   `}</style>
 
       <Navbar />
-
       <div className="container mx-auto px-6 py-6 mt-12 mb-12">
         {/* Profile Section with horizontal layout */}
         <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-blue-100">
           <div className="flex flex-col md:flex-row justify-between">
             <div className="flex flex-col md:flex-row items-start gap-8">
-              {/* Profile Image */}
               <div className="flex flex-col items-center">
-                <div className="relative w-48 h-48">
-                  <img
-                    src={profileData.profileImage}
-                    alt="Profile"
-                    className="w-full h-full rounded-full object-cover border-4 border-blue-500 shadow-md cursor-pointer"
-                    onClick={toggleProfileImageModal}
-                  />
-                  <button className="absolute bottom-2 right-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-2 rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
-                    <Camera size={16} />
-                  </button>
-                </div>
+              <div className="relative w-48 h-48">
+                <img
+                  src={profileData.profileImage}
+                  alt="Profile"
+                  className="w-full h-full rounded-full object-cover border-4 border-blue-500 shadow-md"
+                  onError={(e) => {
+                    setImageError(true);
+                    e.target.src = https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=random&size=200;
+                  }}
+                />
+                <button 
+                  className="absolute bottom-2 right-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-2 rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
+                  onClick={() => {
+                    console.log("Update profile picture clicked");
+                  }}
+                >
+                  <Camera size={16} />
+                </button>
+              </div>
 
-                {/* Verification Status below image */}
                 <div className="mt-4">
                   {profileData.isVerified ? (
                     <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full flex items-center shadow-sm">
@@ -157,10 +189,8 @@ const ProfilePage = () => {
                   )}
                 </div>
               </div>
-
               {/* Main content area with profile info and edit button */}
               <div className="flex flex-col md:flex-row gap-6 mt-6 md:mt-0 w-full">
-                {/* Profile Details in separate div */}
                 <div className="flex flex-col justify-center">
                   <h2 className="text-xl font-semibold text-gray-800">
                     Name- {profileData.name}
@@ -178,7 +208,6 @@ const ProfilePage = () => {
                     </p>
                   </div>
                 </div>
-
                 {/* Edit Profile Button in separate div */}
                 <div className="flex items-start mt-2 md:mt-0 md:ml-auto">
                   <button
@@ -190,10 +219,9 @@ const ProfilePage = () => {
                 </div>
               </div>
             </div>
-
             {/* Right side buttons */}
+
             <div className="flex flex-col justify-between items-end mt-6 md:mt-0">
-              {/* Setting at top right */}
               <div className="flex gap-4">
                 <motion.button
                   className="rounded-full p-2  shadow-lg flex items-center cursor-pointer"
@@ -212,6 +240,7 @@ const ProfilePage = () => {
               {/* Sign Out at bottom right - Updated with onClick handler */}
               <button
                 className="bg-blue-500 cursor-pointer text-white rounded-lg py-2 px-8 w-40 hover:bg-blue-600 transition-colors duration-300 shadow-md flex items-center justify-center mt-4 md:mt-0"
+
                 onClick={handleSignOut}
               >
                 <LogOut size={18} className="mr-2" /> Sign out
@@ -307,9 +336,9 @@ const ProfilePage = () => {
                 </h3>
                 <p className="text-gray-600 mt-1">
                   {badge.month
-                    ? `Month: ${badge.month}`
+                    ? Month: ${badge.month}
                     : badge.count
-                    ? `${badge.count} Deliveries`
+                    ? ${badge.count} Deliveries
                     : badge.description}
                 </p>
               </div>
@@ -419,30 +448,6 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-
-      {/* Profile Image Modal */}
-      {showProfileImageModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
-          onClick={toggleProfileImageModal}
-        >
-          <div className="relative max-w-3xl max-h-screen p-4">
-            <button
-              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70 transition-all duration-300"
-              onClick={toggleProfileImageModal}
-            >
-              <X size={24} />
-            </button>
-            <img
-              src={profileData.profileImage}
-              alt="Profile"
-              className="max-w-full max-h-screen rounded-lg shadow-2xl"
-              style={{ objectFit: "contain" }}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

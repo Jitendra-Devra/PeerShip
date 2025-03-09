@@ -1,6 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
+import { useToast } from '../context/ToastContext';
+
 
 const SignUpModal = ({ isOpen, onClose, onSwitchToSignIn }) => {
+  const { showToast } = useToast();
+  const navigate = useNavigate(); // Add this line to use navigation
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -10,6 +18,8 @@ const SignUpModal = ({ isOpen, onClose, onSwitchToSignIn }) => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,9 +29,133 @@ const SignUpModal = ({ isOpen, onClose, onSwitchToSignIn }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    // Clear previous errors
+    setError("");
+    
+    // Check if passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return false;
+    }
+    
+    // Check password length
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    
+    try {
+      // Make API call to register user
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Clear form
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: ""
+        });
+
+        setError(
+          <div className="text-green-600 font-medium text-center">
+            Registration Successful! Redirecting to login...
+          </div>
+        );
+        
+        setTimeout(() => {
+          onClose();
+          onSwitchToSignIn();
+        }, 1000);
+      } else {
+        setError(
+          <div className="text-red-600 font-medium">
+            {data.message}
+            {data.message.includes('Please sign in')}
+          </div>
+        );
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError("Network error occurred. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+};
+
+
+  // Handle Google login success
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/google-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          credential: credentialResponse.credential
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        onClose();
+        showToast(`Welcome, ${data.user.username}!`); // Add toast message
+        navigate('/');
+        window.dispatchEvent(new Event('auth-change'));
+      } else {
+        // Display error message in red
+        setError(
+          <div className="text-red-600 font-medium">
+            {data.message}
+            {data.message.includes('Please sign in') }
+          </div>
+        );
+      }
+    } catch (error) {
+      console.error('Google signup error:', error);
+      setError('Error during Google authentication');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Handle Google login failure
+  const handleGoogleFailure = (error) => {
+    console.error('Google signup failed:', error);
+    setError('Google authentication failed. Please try again.');
   };
 
   if (!isOpen) return null;
@@ -79,6 +213,13 @@ const SignUpModal = ({ isOpen, onClose, onSwitchToSignIn }) => {
                   </button>
                 </p>
               </div>
+
+              {/* Display error message if exists */}
+              {error && (
+                <div className="mb-2 p-2 text-sm bg-red-50 text-red-800 border border-red-200 rounded-md">
+                  {error}
+                </div>
+              )}
 
               {/* Username field */}
               <div>
@@ -155,6 +296,9 @@ const SignUpModal = ({ isOpen, onClose, onSwitchToSignIn }) => {
                     </svg>
                   </button>
                 </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  Password must be at least 8 characters long
+                </p>
               </div>
 
               {/* Confirm Password field */}
@@ -196,9 +340,10 @@ const SignUpModal = ({ isOpen, onClose, onSwitchToSignIn }) => {
 
               <button
                 type="submit"
-                className="w-full py-2 px-4 text-sm font-medium tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none mt-3"
+                disabled={isLoading}
+                className={`w-full py-2 px-4 text-sm font-medium tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none mt-3 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
-                Create Account
+                {isLoading ? 'Creating Account...' : 'Create Account'}
               </button>
 
               <div className="flex items-center gap-4 my-1">
@@ -207,43 +352,17 @@ const SignUpModal = ({ isOpen, onClose, onSwitchToSignIn }) => {
                 <hr className="w-full border-gray-300" />
               </div>
 
-              <button
-                type="button"
-                className="w-full flex items-center justify-center gap-2 py-2 px-4 text-sm tracking-wide text-gray-800 border border-gray-300 rounded-md bg-gray-50 hover:bg-gray-100 focus:outline-none"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16px"
-                  className="inline"
-                  viewBox="0 0 512 512"
-                >
-                  <path
-                    fill="#fbbd00"
-                    d="M120 256c0-25.367 6.989-49.13 19.131-69.477v-86.308H52.823C18.568 144.703 0 198.922 0 256s18.568 111.297 52.823 155.785h86.308v-86.308C126.989 305.13 120 281.367 120 256z"
-                  />
-                  <path
-                    fill="#0f9d58"
-                    d="m256 392-60 60 60 60c57.079 0 111.297-18.568 155.785-52.823v-86.216h-86.216C305.044 385.147 281.181 392 256 392z"
-                  />
-                  <path
-                    fill="#31aa52"
-                    d="m139.131 325.477-86.308 86.308a260.085 260.085 0 0 0 22.158 25.235C123.333 485.371 187.62 512 256 512V392c-49.624 0-93.117-26.72-116.869-66.523z"
-                  />
-                  <path
-                    fill="#3c79e6"
-                    d="M512 256a258.24 258.24 0 0 0-4.192-46.377l-2.251-12.299H256v120h121.452a135.385 135.385 0 0 1-51.884 55.638l86.216 86.216a260.085 260.085 0 0 0 25.235-22.158C485.371 388.667 512 324.38 512 256z"
-                  />
-                  <path
-                    fill="#cf2d48"
-                    d="m352.167 159.833 10.606 10.606 84.853-84.852-10.606-10.606C388.668 26.629 324.381 0 256 0l-60 60 60 60c36.326 0 70.479 14.146 96.167 39.833z"
-                  />
-                  <path
-                    fill="#eb4132"
-                    d="M256 120V0C187.62 0 123.333 26.629 74.98 74.98a259.849 259.849 0 0 0-22.158 25.235l86.308 86.308C162.883 146.72 206.376 120 256 120z"
-                  />
-                </svg>
-                Sign up with Google
-              </button>
+              {/* Google Login Button */}
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleFailure}
+                  theme="outline"
+                  size="large"
+                  text="signup_with"
+                  shape="rectangular"
+                />
+              </div>
             </form>
           </div>
         </div>

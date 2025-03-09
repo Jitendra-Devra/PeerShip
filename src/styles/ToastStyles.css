@@ -1,0 +1,9 @@
+.toast-container {
+    top: 80px;
+  }
+  
+  .toast-message {
+    font-size: 0.875rem;
+    padding: 8px 16px;
+    width: 290px !important;
+  }
