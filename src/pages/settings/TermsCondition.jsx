@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-
+import Navbar from '../../components/Navbar';
+ 
 const TermsCondition = () => {
   const [expandedSection, setExpandedSection] = useState(null);
 
@@ -8,7 +9,9 @@ const TermsCondition = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-sm">
+    <>
+    <Navbar/>
+    <div className="max-w-4xl mx-auto my-12 p-6 bg-white rounded-lg shadow-sm">
       <div className="border-b border-gray-200 pb-6 mb-6">
         <h1 className="text-3xl font-bold text-blue-700">PEERSHIP - TERMS AND CONDITIONS</h1>
         <p className="text-gray-600 mt-2">Last Updated: March 1, 2025</p>
@@ -331,6 +334,7 @@ const TermsCondition = () => {
         </p>
       </div>
     </div>
+    </>
   );
 };
 

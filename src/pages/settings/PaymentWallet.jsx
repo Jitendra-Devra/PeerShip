@@ -28,29 +28,7 @@ const PaymentWallet = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [notification, setNotification] = useState(null);
 
-  // Handle add money
-  const handleAddMoney = () => {
-    if (addAmount && !isNaN(parseFloat(addAmount))) {
-      const amount = parseFloat(addAmount);
-      setBalance(prev => parseFloat((prev + amount).toFixed(2)));
-      
-      // Add to transactions
-      const newTransaction = {
-        id: transactions.length + 1,
-        type: "received",
-        amount: amount,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        description: "Added to Wallet"
-      };
-      
-      setTransactions([newTransaction, ...transactions]);
-      setAddAmount("");
-      setShowAddMoneyModal(false);
-      
-      // Show notification
-      showNotification("Money added successfully!", "success");
-    }
-  };
+  
 
   // Handle withdraw
   const handleWithdraw = () => {
@@ -211,12 +189,7 @@ const PaymentWallet = () => {
         </div>
         
         <div className="flex space-x-4">
-          <button 
-            onClick={() => setShowAddMoneyModal(true)}
-            className="bg-white text-blue-600 rounded-lg px-4 py-2 flex items-center hover:bg-blue-50 transition-all duration-300 hover:shadow-md"
-          >
-            <Plus size={18} className="mr-2" /> Add Money
-          </button>
+          
           <button 
             onClick={() => setShowWithdrawModal(true)}
             className="bg-white text-blue-600 rounded-lg px-4 py-2 flex items-center hover:bg-blue-50 transition-all duration-300 hover:shadow-md"
@@ -345,66 +318,7 @@ const PaymentWallet = () => {
           )}
         </div>
       </div>
-
-      {/* Add Money Modal with Blurred Background */}
-      {showAddMoneyModal && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-transparent flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl transform transition-all animate-fadeIn">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold text-gray-800">Add Money to Wallet</h3>
-              <button 
-                onClick={() => setShowAddMoneyModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Amount</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₹</span>
-                <input 
-                  type="number" 
-                  value={addAmount}
-                  onChange={(e) => setAddAmount(e.target.value)}
-                  placeholder="0.00"
-                  min="1"
-                  className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                />
-              </div>
-            </div>
-            
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Payment Method</label>
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
-                {paymentMethods.map(method => (
-                  <option key={method.id} value={method.id}>
-                    {method.type} •••• {method.lastFour} {method.isDefault ? '(Default)' : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div className="flex space-x-3">
-              <button 
-                onClick={() => setShowAddMoneyModal(false)}
-                className="flex-1 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleAddMoney}
-                className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!addAmount || isNaN(parseFloat(addAmount)) || parseFloat(addAmount) <= 0}
-              >
-                Add Money
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      
       {/* Withdraw Modal with Blurred Background */}
       {showWithdrawModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-transparent flex items-center justify-center z-50">
