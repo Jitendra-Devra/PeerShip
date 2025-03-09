@@ -3,13 +3,13 @@ import { motion } from "framer-motion";
 
 const About = () => {
   return (
-    <section className="py-10 bg-gray-50">
+    <section id="about-section" className="py-12 bg-gray-50">
       <div className="container px-4 sm:px-6 lg:px-8 mx-auto min-h-[650px] flex flex-col justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-[#007BFF] to-[#28A745] text-transparent bg-clip-text">
             About Us
@@ -41,7 +41,7 @@ const About = () => {
               Whether you're a traveler looking to earn extra money on your
               journey or a sender searching for a quick, affordable delivery
               solution, Peership makes it easy for you to connect
-              and collaborate.
+              and collaborate.
             </p>
           </motion.div>
 
@@ -60,10 +60,10 @@ const About = () => {
             <p className="text-white/90 text-lg leading-relaxed font-medium">
               Our goal is simple: to make package delivery more accessible,
               affordable, and efficient. We believe in a world where sending
-              something doesn’t have to be complicated or expensive. By
+              something doesn't have to be complicated or expensive. By
               utilizing existing travel plans, we help people save time, reduce
               costs, and promote sustainability by making the most of journeys
-              that are already happening.
+              that are already happening.
             </p>
           </motion.div>
         </div>
@@ -85,7 +85,7 @@ const About = () => {
           <p className="text-white/90 text-lg leading-relaxed font-medium">
           Whether you're a frequent traveler looking to make extra income or someone needing a fast, budget-friendly delivery, Peership is the perfect solution for you.
 
-🚀 Start your journey with Peership today
+🚀 Start your journey with Peership today
           </p>
         </motion.div>
       </div>

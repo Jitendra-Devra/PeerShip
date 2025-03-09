@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Navbar from '../../components/Navbar';
+
 
 const Support = () => {
   const [formData, setFormData] = useState({
@@ -124,7 +126,9 @@ const Support = () => {
   };
   
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white">
+    <>
+    <Navbar/>
+    <div className="max-w-5xl mx-auto my-12 p-6 bg-white rounded-lg shadow-sm">
       <header className="text-center mb-10 border-b pb-6">
         <h1 className="text-4xl font-bold mb-3 text-blue-700">PEERSHIP SUPPORT</h1>
         <p className="text-lg text-gray-700 max-w-3xl mx-auto">
@@ -364,6 +368,7 @@ const Support = () => {
         <p>Thank you for being part of the Peership community!</p>
       </footer>
     </div>
+    </>
   );
 };
 

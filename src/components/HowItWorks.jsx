@@ -34,13 +34,13 @@ const steps = [
   {
     title: "Delivery & Payment",
     description:
-      "Your package is safely delivered to the recipient’s doorstep. Confirm the delivery and complete the payment securely within the app.",
+      "Your package is safely delivered to the recipient's doorstep. Confirm the delivery and complete the payment securely within the app.",
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section className="py-20 bg-white">
+    <section id="how-it-works-section" className="py-20 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
