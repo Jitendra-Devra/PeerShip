@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
+
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import ResetPasswordForm from "./components/ResetPassword";
@@ -8,6 +9,10 @@ import ExploreDeliveries from "./components/ExploreDeliveries";
 import PostDeliveries from "./components/PostDeliveries";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastProvider } from "./context/ToastContext";
+import TermsCondition from "./pages/settings/TermsCondition";
+import Support from './pages/settings/Support';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Safety from "./pages/Safety";
 
 
 const App = () => {
@@ -58,7 +63,11 @@ const App = () => {
           }
       />
 
-      {/* Auth routes */}
+    <Routes>
+      <Route path="/terms" element={<TermsCondition />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/Safety" element={<Safety/>}/>
+      <Route path="/support" element={<Support />} />        
       <Route path="/reset-password" element={<ResetPasswordForm />} />
     </Routes>
     </ToastProvider>

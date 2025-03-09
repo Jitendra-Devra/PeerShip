@@ -1,7 +1,19 @@
 import React from "react";
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const Footer= () => {
+const Footer = () => {
+  // Add a scroll function to handle smooth scrolling to sections
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      window.scrollTo({
+        top: section.offsetTop,
+        behavior: "smooth"
+      });
+    }
+  };
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-7xl">
@@ -9,8 +21,8 @@ const Footer= () => {
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold mb-4">Company</h3>
             <ul className="space-y-2">
-              <li><a href="/about" className="hover:text-[#007BFF] transition-colors">About Us</a></li>
-              <li><a href="/how-it-works" className="hover:text-[#007BFF] transition-colors">How PeerShip Works</a></li>
+              <li><a href="#" onClick={(e) => {e.preventDefault(); scrollToSection("about-section");}} className="hover:text-[#007BFF] transition-colors">About Us</a></li>
+              <li><a href="#" onClick={(e) => {e.preventDefault(); scrollToSection("how-it-works-section");}} className="hover:text-[#007BFF] transition-colors">How PeerShip Works</a></li>
               <li><a href="/careers" className="hover:text-[#007BFF] transition-colors">Careers</a></li>
               <li><a href="/press" className="hover:text-[#007BFF] transition-colors">Press</a></li>
             </ul>
@@ -19,11 +31,11 @@ const Footer= () => {
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
-              <li><a href="/help" className="hover:text-[#007BFF] transition-colors">Help Center</a></li>
-              <li><a href="/safety" className="hover:text-[#007BFF] transition-colors">Safety</a></li>
-              <li><a href="/terms" className="hover:text-[#007BFF] transition-colors">Terms of Service</a></li>
-              <li><a href="/privacy" className="hover:text-[#007BFF] transition-colors">Privacy Policy</a></li>
-            </ul>
+          <li><Link to="/support" className="hover:text-[#007BFF] transition-colors">Support</Link></li>
+          <li><Link to="/safety" className="hover:text-[#007BFF] transition-colors">Safety</Link></li>
+          <li><Link to="/terms" className="hover:text-[#007BFF] transition-colors">Terms of Service</Link></li>
+          <li><Link to="/privacy" className="hover:text-[#007BFF] transition-colors">Privacy Policy</Link></li>
+        </ul>
           </div>
 
           <div className="text-center md:text-left">
@@ -58,7 +70,7 @@ const Footer= () => {
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-center items-center">
           <p className="text-sm text-gray-400">© 2024 PeerShip. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0 md:ml-8">
-            <a href="/terms" className="text-sm text-gray-400 hover:text-[#007BFF] transition-colors">Terms</a>
+            <Link to="/terms" className="text-sm text-gray-400 hover:text-[#007BFF] transition-colors">Terms</Link>
             <a href="/privacy" className="text-sm text-gray-400 hover:text-[#007BFF] transition-colors">Privacy</a>
             <a href="/cookies" className="text-sm text-gray-400 hover:text-[#007BFF] transition-colors">Cookies</a>
           </div>
