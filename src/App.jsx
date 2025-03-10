@@ -63,7 +63,7 @@ const App = () => {
           }
       />
 
-    <Routes>
+    
       <Route path="/terms" element={<TermsCondition />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/Safety" element={<Safety/>}/>

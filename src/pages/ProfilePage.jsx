@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { User, LogOut, Mail, Phone, Camera, Shield, IndianRupee, History, Package, Truck} from "lucide-react";
-import { Uisetting,Uistar } from "../components/ui/Icons.jsx";
+import { User, LogOut, Mail, Phone, Camera, Shield, IndianRupee, History, Package, Truck, Star, AlertTriangle, Award, Gift, Users } from "lucide-react";
+import { Uisetting, Uistar } from "../components/ui/Icons.jsx";
 import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -20,6 +20,13 @@ const ProfilePage = () => {
     isVerified: false,
     profileImage: "https://ui-avatars.com/api/?background=random",
     walletBalance: "₹0.00",
+    stats: {
+      totalDeliveries: 0,
+      averageRating: 0,
+      averageEarnings: "₹0.00"
+    },
+    badges: [],
+    referralCode: "REFER123"
   });
 
   const navigateToSettings = () => {
@@ -28,6 +35,10 @@ const ProfilePage = () => {
 
   const handleEditProfile = () => {
     navigate("/profile/settings/account");
+  };
+  
+  const navigateToVerification = () => {
+    navigate("/profile/settings/verify");
   };
 
   useEffect(() => {
@@ -42,7 +53,7 @@ const ProfilePage = () => {
         const response = await fetch('http://localhost:5000/api/auth/profile', {
           method: 'GET',
           headers: {
-            'Authorization': Bearer ${token},
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           credentials: 'include'
@@ -58,9 +69,18 @@ const ProfilePage = () => {
           name: userData.username || "User",
           email: userData.email || "",
           phone: userData.phone || "Not provided",
-          isVerified: userData.isVerified || false,
-          profileImage: userData.profilePicture || https://ui-avatars.com/api/?name=${encodeURIComponent(userData.username)}&background=random&size=200,
+          // isVerified: userData.isVerified || false,
+          //i have commented the above code because the prompt that i made to verify user is not showing up
+          isVerified:  false,
+          profileImage: userData.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.username)}&background=random&size=200`,
           walletBalance: userData.walletBalance || "0.00",
+          stats: userData.stats || {
+            totalDeliveries: 0,
+            averageRating: 0,
+            averageEarnings: "₹0.00"
+          },
+          badges: userData.badges || [],
+          referralCode: userData.referralCode || "REFER123"
         });
 
         setImageError(!userData.profilePicture);
@@ -111,7 +131,7 @@ const ProfilePage = () => {
   const copyReferralCode = () => {
     navigator.clipboard.writeText(profileData.referralCode);
     // In a real app, you would show a toast notification here
-    alert("Referral code copied to clipboard!");
+    showToast("Referral code copied to clipboard!");
   };
 
   // Function to render star ratings
@@ -164,7 +184,7 @@ const ProfilePage = () => {
                   className="w-full h-full rounded-full object-cover border-4 border-blue-500 shadow-md"
                   onError={(e) => {
                     setImageError(true);
-                    e.target.src = https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=random&size=200;
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=random&size=200`;
                   }}
                 />
                 <button 
@@ -221,7 +241,7 @@ const ProfilePage = () => {
             </div>
             {/* Right side buttons */}
 
-            <div className="flex flex-col justify-between items-end mt-6 md:mt-0">
+            <div className="flex flex-col justify-between items-end mt-6 md:mt-0 ">
               <div className="flex gap-4">
                 <motion.button
                   className="rounded-full p-2  shadow-lg flex items-center cursor-pointer"
@@ -239,7 +259,7 @@ const ProfilePage = () => {
 
               {/* Sign Out at bottom right - Updated with onClick handler */}
               <button
-                className="bg-blue-500 cursor-pointer text-white rounded-lg py-2 px-8 w-40 hover:bg-blue-600 transition-colors duration-300 shadow-md flex items-center justify-center mt-4 md:mt-0"
+                className="bg-blue-500 cursor-pointer text-white rounded-lg py-2 px-8 w-40 md:w-36 md:px-4 hover:bg-blue-600 transition-colors duration-300 shadow-md flex items-center justify-center mt-4 md:mt-0"
 
                 onClick={handleSignOut}
               >
@@ -280,7 +300,7 @@ const ProfilePage = () => {
         {/* User Stats Section */}
         <div className="bg-white border border-blue-100 rounded-xl shadow-lg p-6 mb-8 hover:shadow-xl transition-shadow duration-300">
           <h2 className="text-xl font-semibold text-blue-700 mb-6 flex items-center">
-            <Uistar size={24} className="mr-2 text-blue-500" /> User Stats
+            <Uistar className="w-6 h-6 mr-2 text-blue-500" /> User Stats
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-blue-50 p-4 rounded-lg flex flex-col items-center">
@@ -336,9 +356,9 @@ const ProfilePage = () => {
                 </h3>
                 <p className="text-gray-600 mt-1">
                   {badge.month
-                    ? Month: ${badge.month}
+                    ? `Month: ${badge.month}`
                     : badge.count
-                    ? ${badge.count} Deliveries
+                    ? `${badge.count} Deliveries`
                     : badge.description}
                 </p>
               </div>
@@ -357,7 +377,7 @@ const ProfilePage = () => {
             </div>
             <button
               onClick={() => navigate("/dashboard/reviews")}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md"
+              className="bg-blue-600 cursor-pointer text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md"
             >
               View in Dashboard
             </button>
@@ -389,7 +409,7 @@ const ProfilePage = () => {
                 </p>
               </div>
               <button
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md w-full sm:w-auto"
+                className="bg-blue-600 cursor-pointer text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md w-full sm:w-auto"
                 onClick={copyReferralCode}
               >
                 Copy Code
