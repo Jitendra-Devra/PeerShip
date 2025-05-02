@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import connectDB from './src/database/dbConnect.js';
 import authRoutes from './src/api/routes/authRoutes.js';
+import vehicleRoutes from './src/api/routes/vehicleRoutes.js';
 import passport from 'passport';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
@@ -27,7 +28,7 @@ app.use(express.json());
 
 // Enable CORS
 app.use(cors({
-  origin: ['http://localhost:5173'],
+  origin: ['http://localhost:5173'],// Allow requests from the frontend
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -62,6 +63,7 @@ configurePassport(passport);
 
 // Mount routes
 app.use('/api/auth', authRoutes);
+app.use('/api/vehicles', vehicleRoutes);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
@@ -71,6 +73,11 @@ app.use((err, req, res, next) => {
     message: err.message,
     stack: process.env.NODE_ENV === 'production' ? null : err.stack,
   });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({ message: err.message });
 });
 
 app.use((req, res, next) => {

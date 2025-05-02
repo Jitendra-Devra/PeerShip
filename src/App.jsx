@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 
 import ProfilePage from "./pages/ProfilePage";
+import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 import ResetPasswordForm from "./components/ResetPassword";
 import ExploreDeliveries from "./components/ExploreDeliveries";
@@ -39,6 +40,14 @@ const App = () => {
           }
         />
         <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/profile/settings/*"
           element={
             <ProtectedRoute>
@@ -69,6 +78,8 @@ const App = () => {
       <Route path="/Safety" element={<Safety/>}/>
       <Route path="/support" element={<Support />} />        
       <Route path="/reset-password" element={<ResetPasswordForm />} />
+      {/* At the end of your Routes component in App.jsx, add this: */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
     </ToastProvider>
   );
