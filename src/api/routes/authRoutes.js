@@ -3,7 +3,8 @@ import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import User from '../../database/models/User.js';
-import { signup, signin, getUserProfile, updateProfilePicture, forgotPassword } from '../../auth/authController.js';
+import { deleteAccount } from '../../auth/authController.js';
+import { signup, signin, getUserProfile, updateProfilePicture, forgotPassword, updateUserProfile } from '../../auth/authController.js';
 import { protect } from '../../middleware/authMiddleware.js';
 import { generateResetToken, sendPasswordResetEmail } from '../../utils/passwordUtils.js';
 
@@ -161,7 +162,9 @@ router.post('/reset-password', async (req, res) => {
 // Auth routes
 router.post('/signup', signup);
 router.post('/signin', signin);
-router.get('/profile', protect, getUserProfile);
-router.put('/profile/picture', protect, updateProfilePicture);
+router.get('/profile', protect, getUserProfile); // Fetch user profile
+router.put('/profile', protect, updateUserProfile); // Update user profile
+router.put('/profile/picture', protect, updateProfilePicture); // Update profile picture
+router.delete('/delete-account',protect,deleteAccount); // Delete account
 
 export default router;

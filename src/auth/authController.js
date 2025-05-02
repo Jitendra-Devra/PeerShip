@@ -47,7 +47,6 @@ const signup = asyncHandler(async (req, res) => {
       throw new Error('Invalid user data');
     }
   } catch (error) {
-    console.error('Signup error:', error);
     res.status(500);
     throw new Error(error.message || 'Error creating user');
   }
@@ -93,7 +92,6 @@ const signin = asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Signin error:', error);
     res.status(error.status || 500);
     throw new Error(error.message || 'Error during signin');
   }
@@ -123,13 +121,18 @@ const getUserProfile = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       phone: user.phone || null,
-      isVerified: user.isEmailVerified || false,
+      gender: user.gender || 'prefer-not-to-say',
+      dateOfBirth: user.dateOfBirth || null,
+      address: user.address || '',
+      city: user.city || '',
+      state: user.state || '',
+      zipCode: user.zipCode || '',
+      country: user.country || '',
       profilePicture: profilePicture,
       walletBalance: user.walletBalance || "0.00",
       isGoogleUser: user.isGoogleUser || false
     });
   } catch (error) {
-    console.error('Error fetching user profile:', error);
     res.status(500);
     throw new Error('Error fetching user profile');
   }
@@ -138,6 +141,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @desc    Update user profile picture
 // @route   PUT /api/auth/profile/picture
 const updateProfilePicture = asyncHandler(async (req, res) => {
+  
   try {
     const { profilePicture } = req.body;
     
@@ -156,7 +160,6 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
       profilePicture: user.profilePicture
     });
   } catch (error) {
-    console.error('Error updating profile picture:', error);
     res.status(500);
     throw new Error('Error updating profile picture');
   }
@@ -165,7 +168,6 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
 const forgotPassword = asyncHandler(async (req, res) => {
   try {
     const { email } = req.body;
-    console.log('Processing forgot password for email:', email); // Debug log
     
     const user = await User.findOne({ email });
     
@@ -196,11 +198,93 @@ const forgotPassword = asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Forgot password error:', error);
     res.status(500).json({ 
       message: 'An error occurred while processing your request.' 
     });
   }
 });
 
-export { signup, signin, getUserProfile, updateProfilePicture, forgotPassword };
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const allowedGenders = ['male', 'female', 'non-binary', 'prefer-not-to-say'];
+  if (req.body.gender && !allowedGenders.includes(req.body.gender)) {
+    return res.status(400).json({ message: 'Invalid gender value' });
+  }
+
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.username = req.body.username !== undefined ? req.body.username : user.username;
+    user.email = req.body.email !== undefined ? req.body.email : user.email;
+    user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
+    user.gender = req.body.gender !== undefined ? req.body.gender : user.gender;
+    user.dateOfBirth = req.body.dateOfBirth !== undefined ? req.body.dateOfBirth : user.dateOfBirth;
+    user.address = req.body.address !== undefined ? req.body.address : user.address;
+    user.city = req.body.city !== undefined ? req.body.city : user.city;
+    user.state = req.body.state !== undefined ? req.body.state : user.state;
+    user.zipCode = req.body.zipCode !== undefined ? req.body.zipCode : user.zipCode;
+    user.country = req.body.country !== undefined ? req.body.country : user.country;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      username: updatedUser.username,
+      email: updatedUser.email,
+      phone: updatedUser.phone,
+      gender: updatedUser.gender,
+      dateOfBirth: updatedUser.dateOfBirth,
+      address: updatedUser.address,
+      city: updatedUser.city,
+      state: updatedUser.state,
+      zipCode: updatedUser.zipCode,
+      country: updatedUser.country,
+      profilePicture: updatedUser.profilePicture,
+    });
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
+});
+
+/// @desc    Delete user account
+// @route   DELETE /api/auth/delete-account
+const deleteAccount = asyncHandler(async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('+password'); // Ensure password is included
+
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    // Check if the user has a password
+    if (!user.password) {
+      res.status(400);
+      throw new Error('This account does not have a password. Please use Google Sign-In to manage your account.');
+    }
+
+    // Check if password is provided in the request
+    if (!req.body.password) {
+      res.status(400);
+      throw new Error('Password is required to delete your account.');
+    }
+
+    // Verify the password
+    const isMatch = await user.matchPassword(req.body.password);
+    if (!isMatch) {
+      res.status(401);
+      throw new Error('Incorrect password');
+    }
+
+    // Delete the user account - Replace deprecated remove() method with deleteOne()
+    await User.deleteOne({ _id: user._id });
+
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (error) {
+    res.status(error.status || 500);
+    throw new Error(error.message || 'Error deleting account');
+  }
+});
+
+export { signup, signin, getUserProfile, updateUserProfile, updateProfilePicture, forgotPassword, deleteAccount };

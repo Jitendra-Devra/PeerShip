@@ -34,6 +34,37 @@ const UserSchema = new mongoose.Schema(
         return !this.isGoogleUser;
       },
     },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'non-binary', 'prefer-not-to-say'], // Allowed values
+      default: 'prefer-not-to-say',
+    },
+    dateOfBirth: {
+      type: Date,
+    },
+    address: {
+      type: String,
+    },
+    city:{
+      type: String,
+      default:'',
+    },
+    state:{
+      type: String,
+      default:'',
+    },
+    zipCode:{
+      type: String,
+      default:'',
+    },
+    country:{
+      type: String,
+      default:'',
+    },
     googleId: {
       type: String,
       unique: true,
@@ -63,11 +94,105 @@ const UserSchema = new mongoose.Schema(
     },
     resetPasswordExpires: {
       type: Date,
-    }
+    },
+    isDeliveryPartner: {
+      type: Boolean,
+      default: false,
+    },
+    partnerDetails: {
+      approved: {
+        type: Boolean,
+        default: false,
+      },
+      averageRating: {
+        type: Number,
+        default: 0,
+      },
+      totalDeliveries: {
+        type: Number,
+        default: 0,
+      },
+      totalEarnings: {
+        type: Number,
+        default: 0,
+      },
+    },
+    vehicles:[
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vehicle',
+      }
+    ],
+    // Add verification documents
+    verificationStatus: {
+      type: String,
+      enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
+      default: 'Not Submitted'
+    },
+    verificationDocuments: {
+      governmentId: {
+        path: String,
+        uploadedAt: Date,
+        status: {
+          type: String,
+          enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
+          default: 'Not Submitted'
+        }
+      },
+      proofOfAddress: {
+        path: String,
+        uploadedAt: Date,
+        status: {
+          type: String,
+          enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
+          default: 'Not Submitted'
+        }
+      },
+      proofOfInsurance: {
+        path: String,
+        uploadedAt: Date,
+        status: {
+          type: String,
+          enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
+          default: 'Not Submitted'
+        }
+      },
+      backgroundCheckConsent: {
+        path: String,
+        uploadedAt: Date,
+        status: {
+          type: String,
+          enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
+          default: 'Not Submitted'
+        }
+      }
+    },
   },
   { timestamps: true }
-
 );
+
+// Add method to check verification status
+UserSchema.methods.checkVerificationStatus = async function() {
+  const docs = this.verificationDocuments;
+  const allDocsSubmitted = docs.governmentId.path && 
+                         docs.proofOfAddress.path && 
+                         docs.proofOfInsurance.path && 
+                         docs.backgroundCheckConsent.path;
+                         
+  const allDocsApproved = docs.governmentId.status === 'Approved' && 
+                        docs.proofOfAddress.status === 'Approved' && 
+                        docs.proofOfInsurance.status === 'Approved' && 
+                        docs.backgroundCheckConsent.status === 'Approved';
+                        
+  if (allDocsSubmitted && allDocsApproved) {
+    this.partnerDetails.approved = true;
+    this.verificationStatus = 'Approved';
+  } else if (allDocsSubmitted && !allDocsApproved) {
+    this.verificationStatus = 'Pending';
+  }
+  
+  return this.save();
+};
 
 const getHighQualityPicture = (url) => {
   if (!url) return null;
