@@ -48,6 +48,8 @@ router.get('/google/callback',
 // Login with Google on the client side (receives token from client)
 router.post('/google-login', async (req, res) => {
   try {
+    console.log('Incoming Google Request:', req.body);
+    
     const { credential } = req.body;
     
     // Verify the Google token
