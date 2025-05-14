@@ -29,8 +29,8 @@ const PostDeliveries = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-50 via-blue-50 to-white mx-auto mt-15 ">
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-3xl transform transition-all hover:shadow-2xl">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-50 via-blue-50 to-white mx-auto">
+        <div className="rounded-2xl p-3 w-full transform transition-all">
           <h2 className="text-3xl font-extrabold text-center bg-clip-text mb-8 text-[#007BFF]">
             Post a Delivery
           </h2>
@@ -53,7 +53,7 @@ const PostDeliveries = () => {
                 <select
                   value={urgency}
                   onChange={(e) => setUrgency(e.target.value)}
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-white"
                   required
                 >
                   <option value="Normal">Normal</option>
@@ -69,7 +69,7 @@ const PostDeliveries = () => {
                   type="text"
                   value={pickupLocation}
                   onChange={(e) => setPickupLocation(e.target.value)}
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-white"
                   placeholder="Auto-detect or manual entry"
                   required
                 />
@@ -80,7 +80,7 @@ const PostDeliveries = () => {
                   type="text"
                   value={dropOffLocation}
                   onChange={(e) => setDropOffLocation(e.target.value)}
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-white"
                   placeholder="Enter drop-off location"
                   required
                 />
@@ -91,7 +91,7 @@ const PostDeliveries = () => {
                   type="datetime-local"
                   value={preferredPickupDateTime}
                   onChange={(e) => setPreferredPickupDateTime(e.target.value)}
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-white"
                   required
                 />
               </div>
@@ -100,7 +100,7 @@ const PostDeliveries = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Amount Suggested By AI</label>
-                <div className="w-full p-3 border border-gray-200 rounded-lg bg-gray-100 text-gray-600">
+                <div className="w-full p-3 border border-gray-200 rounded-lg bg-white text-gray-600">
                   You have to pay: {amount}
                 </div>
               </div>
@@ -109,7 +109,7 @@ const PostDeliveries = () => {
                 <select
                   value={sizeWeight}
                   onChange={(e) => setSizeWeight(e.target.value)}
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-white"
                   required
                 >
                   <option value="Small">Small</option>
@@ -124,7 +124,7 @@ const PostDeliveries = () => {
               <textarea
                 value={additionalNotes}
                 onChange={(e) => setAdditionalNotes(e.target.value)}
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 bg-white"
                 placeholder="e.g., Handle with care"
                 rows="4"
               />
