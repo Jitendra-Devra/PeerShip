@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 
 const ExploreDeliveries = () => {
+  // State variables
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
   const [sortBy, setSortBy] = useState("Highest Payment");
@@ -17,39 +18,19 @@ const ExploreDeliveries = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isAnimated, setIsAnimated] = useState(false);
   const [loadedItems, setLoadedItems] = useState([]);
+  const [filteredDeliveryItems, setFilteredDeliveryItems] = useState([]);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [hasFiltered, setHasFiltered] = useState(false);
 
-  // clicking the "Accept" button marks a delivery as selected
+  // Accepted deliveries state
   const [acceptedCards, setAcceptedCards] = useState(() => {
     const initialAccepted = {};
-    const randomIndexes = [1, 4]; // You can make this dynamic using Math.random if you want
+    const randomIndexes = [1, 4];
     randomIndexes.forEach((i) => (initialAccepted[i] = true));
     return initialAccepted;
   });
 
-  const handleAccept = (index) => {
-    setAcceptedCards((prev) => ({
-      ...prev,
-      [index]: true,
-    }));
-  };
-
-  const handleParcelSizeChange = (size) => {
-    setParcelSizeFilter({
-      ...parcelSizeFilter,
-      [size]: !parcelSizeFilter[size],
-    });
-  };
-
-  const handleUrgencyChange = (urgency) => {
-    setUrgencyFilter({ ...urgencyFilter, [urgency]: !urgencyFilter[urgency] });
-  };
-
-  const clearFilters = () => {
-    setParcelSizeFilter({ Small: false, Medium: false, Large: false });
-    setUrgencyFilter({ Normal: false, Urgent: false });
-    setSortBy("Highest Payment");
-  };
-
+  // Sample delivery items data
   const deliveryItems = [
     {
       item: "Laptop",
@@ -137,27 +118,124 @@ const ExploreDeliveries = () => {
     },
   ];
 
-  // Filter delivery items based on the searched route
-  const filteredItems = deliveryItems.filter(
-    (item) =>
-      item.pickupLocation.toLowerCase().includes(fromLocation.toLowerCase()) &&
-      item.dropOffLocation.toLowerCase().includes(toLocation.toLowerCase())
-  );
+  // Initial load - show all items sorted by highest payment
+  useEffect(() => {
+    const sortedItems = [...deliveryItems].sort((a, b) => 
+      parseInt(b.offeredPayment.replace("₹", "")) - 
+      parseInt(a.offeredPayment.replace("₹", ""))
+    );
+    setFilteredDeliveryItems(sortedItems);
+  }, []);
+
+  // Handle accepting a delivery
+  const handleAccept = (index) => {
+    setAcceptedCards((prev) => ({
+      ...prev,
+      [index]: true,
+    }));
+  };
+
+  // Toggle parcel size filter
+  const handleParcelSizeChange = (size) => {
+    setParcelSizeFilter({
+      ...parcelSizeFilter,
+      [size]: !parcelSizeFilter[size],
+    });
+  };
+
+  // Toggle urgency filter
+  const handleUrgencyChange = (urgency) => {
+    setUrgencyFilter({ ...urgencyFilter, [urgency]: !urgencyFilter[urgency] });
+  };
+
+  // Clear all filters and reset to initial state
+  const clearFilters = () => {
+    setParcelSizeFilter({ Small: false, Medium: false, Large: false });
+    setUrgencyFilter({ Normal: false, Urgent: false });
+    setSortBy("Highest Payment");
+    setFromLocation("");
+    setToLocation("");
+    setHasSearched(false);
+    setHasFiltered(false);
+    
+    // Reset to show all items sorted by highest payment
+    const sortedItems = [...deliveryItems].sort((a, b) => 
+      parseInt(b.offeredPayment.replace("₹", "")) - 
+      parseInt(a.offeredPayment.replace("₹", ""))
+    );
+    setFilteredDeliveryItems(sortedItems);
+  };
+
+  // Handle search action
+  const handleSearch = () => {
+    setHasSearched(true);
+    applyFilters();
+  };
+
+  // Apply filters based on current state
+  const applyFilters = () => {
+    let filtered = [...deliveryItems];
+    
+    // Filter by location if search was performed
+    if (hasSearched && (fromLocation || toLocation)) {
+      filtered = filtered.filter(
+        (item) =>
+          item.pickupLocation.toLowerCase().includes(fromLocation.toLowerCase()) &&
+          item.dropOffLocation.toLowerCase().includes(toLocation.toLowerCase())
+      );
+    }
+    
+    // Apply additional filters if any are active
+    if (hasFiltered) {
+      // Filter by parcel size
+      const selectedSizes = Object.keys(parcelSizeFilter).filter(size => parcelSizeFilter[size]);
+      if (selectedSizes.length > 0) {
+        filtered = filtered.filter(item => selectedSizes.includes(item.parcelSize));
+      }
+      
+      // Filter by urgency
+      const selectedUrgencies = Object.keys(urgencyFilter).filter(urgency => urgencyFilter[urgency]);
+      if (selectedUrgencies.length > 0) {
+        filtered = filtered.filter(item => selectedUrgencies.includes(item.urgency));
+      }
+    }
+    
+    // Apply sorting
+    if (sortBy === "Highest Payment") {
+      filtered.sort((a, b) => 
+        parseInt(b.offeredPayment.replace("₹", "")) - 
+        parseInt(a.offeredPayment.replace("₹", ""))
+      );
+    } else if (sortBy === "Closest Pickup") {
+      filtered.sort((a, b) => a.postedHoursAgo - b.postedHoursAgo);
+    }
+    
+    setFilteredDeliveryItems(filtered);
+    setIsAnimated(false);
+    setLoadedItems([]);
+  };
+
+  // Handle applying filters from filter panel
+  const handleApplyFilters = () => {
+    setHasFiltered(true);
+    applyFilters();
+    setIsFilterOpen(false);
+  };
 
   // Animation for loading items
   useEffect(() => {
-    if (filteredItems.length > 0 && !isAnimated) {
+    if (filteredDeliveryItems.length > 0 && !isAnimated) {
       const timer = setTimeout(() => {
-        setLoadedItems([filteredItems[0]]);
+        setLoadedItems([filteredDeliveryItems[0]]);
 
         const loadInterval = setInterval(() => {
           setLoadedItems((prev) => {
-            if (prev.length >= filteredItems.length) {
+            if (prev.length >= filteredDeliveryItems.length) {
               clearInterval(loadInterval);
               setIsAnimated(true);
-              return filteredItems;
+              return filteredDeliveryItems;
             }
-            return [...prev, filteredItems[prev.length]];
+            return [...prev, filteredDeliveryItems[prev.length]];
           });
         }, 150);
 
@@ -169,17 +247,13 @@ const ExploreDeliveries = () => {
       return () => {
         clearTimeout(timer);
       };
-    } else if (filteredItems.length === 0) {
+    } else if (filteredDeliveryItems.length === 0) {
       setLoadedItems([]);
       setIsAnimated(false);
     }
-  }, [filteredItems]);
+  }, [filteredDeliveryItems]);
 
-  const handleSearch = () => {
-    setIsAnimated(false);
-    setLoadedItems([]);
-  };
-
+  // Get gradient style for card borders
   const getCardBorderStyle = (index) => {
     const gradients = [
       "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
@@ -192,15 +266,15 @@ const ExploreDeliveries = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-gradient-to-b from-indigo-50 via-blue-50 to-white mx-auto mt-15 ">
+      <div className="bg-gradient-to-b from-indigo-50 via-blue-50 to-white mx-auto mt-3">
         {/* Search Bar and Filter Section */}
         <div className="container mx-auto px-4 pt-12">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 mb-8">
+          <div className="p-6 mb-8">
             <h1 className="text-3xl font-bold text-center mb-6 text-[#007BFF]">
               Find Available Deliveries
             </h1>
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex-1 flex flex-col md:flex-row gap-4 w-full">
+              <div className="flex-1 flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg
@@ -228,22 +302,14 @@ const ExploreDeliveries = () => {
                     placeholder="From Location"
                     value={fromLocation}
                     onChange={(e) => setFromLocation(e.target.value)}
-                    className="pl-10 w-full border-2 border-indigo-100 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 shadow-sm hover:shadow-md"
+                    className="bg-white pl-10 w-full border-2 border-indigo-100 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 shadow-sm hover:shadow-md"
                   />
                 </div>
                 <div className="relative flex-1">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg
-                      className="w-5 h-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round"
+                        strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                       ></path>
                       <path
                         strokeLinecap="round"
@@ -258,7 +324,7 @@ const ExploreDeliveries = () => {
                     placeholder="To Location"
                     value={toLocation}
                     onChange={(e) => setToLocation(e.target.value)}
-                    className="pl-10 w-full border-2 border-indigo-100 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 shadow-sm hover:shadow-md"
+                    className="bg-white pl-10 w-full border-2 border-indigo-100 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 shadow-sm hover:shadow-md"
                   />
                 </div>
               </div>
@@ -282,7 +348,7 @@ const ExploreDeliveries = () => {
                   </svg>
                   Search
                 </button>
-                <button
+                <button 
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
                   className="flex-1 md:flex-none border-2 border-indigo-600 bg-white text-indigo-600 px-6 py-4 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2"
                 >
@@ -308,9 +374,30 @@ const ExploreDeliveries = () => {
           {/* Filter Dropdown */}
           {isFilterOpen && (
             <div className="bg-white p-6 rounded-2xl shadow-2xl mb-8 border border-indigo-100 transform transition-all duration-300 animate-fadeIn">
-              <h3 className="font-bold text-2xl mb-6 text-indigo-800 border-b border-indigo-100 pb-2">
-                Filters & Sorting Options
-              </h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-2xl text-indigo-800">
+                  Filters & Sorting Options
+                </h3>
+                <button 
+                  onClick={() => setIsFilterOpen(false)}
+                  className="text-gray-500 hover:text-indigo-600 transition-colors"
+                >
+                  <svg 
+                    className="w-6 h-6" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth="2" 
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div className="border-b border-indigo-100 pb-2 mb-6"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <h4 className="font-semibold text-lg mb-3 text-indigo-700">
@@ -399,7 +486,7 @@ const ExploreDeliveries = () => {
                 </button>
                 <button
                   className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-                  onClick={() => setIsFilterOpen(false)}
+                  onClick={handleApplyFilters}
                 >
                   Apply Filters
                 </button>
@@ -408,7 +495,7 @@ const ExploreDeliveries = () => {
           )}
 
           {/* Delivery Items Grid or No Parcels Message */}
-          {filteredItems.length === 0 ? (
+          {filteredDeliveryItems.length === 0 ? (
             <div className="flex flex-col justify-center items-center h-64 bg-white rounded-2xl shadow-lg p-10">
               <div className="mb-6">
                 <svg
@@ -426,10 +513,14 @@ const ExploreDeliveries = () => {
                 </svg>
               </div>
               <p className="text-2xl text-center text-indigo-700 font-semibold">
-                No parcels available on this route
+                {hasSearched || hasFiltered 
+                  ? "No parcels match your criteria" 
+                  : "No parcels available"}
               </p>
               <p className="text-gray-500 text-center mt-2">
-                Try a different route or check back later!
+                {hasSearched || hasFiltered
+                  ? "Try adjusting your filters or search terms"
+                  : "Please check back later!"}
               </p>
             </div>
           ) : (
@@ -437,7 +528,7 @@ const ExploreDeliveries = () => {
               {loadedItems.map((item, index) => (
                 <div
                   key={index}
-                  className={`relative bg-white rounded-2xl overflow-hidden shadow-lg transform transition-all duration-500 ${
+                  className={`relative bg-white overflow-hidden shadow-lg transform transition-all duration-500 ${
                     acceptedCards[index]
                       ? "grayscale pointer-events-none"
                       : "hover:shadow-2xl hover:-translate-y-2"
@@ -450,6 +541,7 @@ const ExploreDeliveries = () => {
                     borderImageSlice: 1,
                     borderWidth: "2px",
                     borderStyle: "solid",
+                    
                     filter: acceptedCards[index]
                       ? "grayscale(100%) brightness(90%)"
                       : "none",
