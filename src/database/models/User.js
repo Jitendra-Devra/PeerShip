@@ -129,42 +129,48 @@ const UserSchema = new mongoose.Schema(
       enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
       default: 'Not Submitted'
     },
+    verificationRequestedAt: { type: Date },
+    // ... inside UserSchema
     verificationDocuments: {
       governmentId: {
-        path: String,
+        path: { type: String }, // This will store the Cloudinary URL
+        publicId: { type: String }, // This is for deleting the file from Cloudinary
         uploadedAt: Date,
         status: {
           type: String,
           enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
-          default: 'Not Submitted'
-        }
+          default: 'Not Submitted',
+        },
       },
       proofOfAddress: {
-        path: String,
+        path: { type: String },
+        publicId: { type: String },
         uploadedAt: Date,
         status: {
           type: String,
           enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
-          default: 'Not Submitted'
-        }
+          default: 'Not Submitted',
+        },
       },
       proofOfInsurance: {
-        path: String,
+        path: { type: String },
+        publicId: { type: String },
         uploadedAt: Date,
         status: {
           type: String,
           enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
-          default: 'Not Submitted'
-        }
+          default: 'Not Submitted',
+        },
       },
-      backgroundCheckConsent: {
-        path: String,
+      vehicleRegistrationCertificate: {
+        path: { type: String },
+        publicId: { type: String },
         uploadedAt: Date,
         status: {
           type: String,
           enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
-          default: 'Not Submitted'
-        }
+          default: 'Not Submitted',
+        },
       }
     },
   },
@@ -177,18 +183,20 @@ UserSchema.methods.checkVerificationStatus = async function() {
   const allDocsSubmitted = docs.governmentId.path && 
                          docs.proofOfAddress.path && 
                          docs.proofOfInsurance.path && 
-                         docs.backgroundCheckConsent.path;
+                         docs.vehicleRegistrationCertificate.path;
                          
   const allDocsApproved = docs.governmentId.status === 'Approved' && 
                         docs.proofOfAddress.status === 'Approved' && 
                         docs.proofOfInsurance.status === 'Approved' && 
-                        docs.backgroundCheckConsent.status === 'Approved';
+                        docs.vehicleRegistrationCertificate.status === 'Approved';
                         
   if (allDocsSubmitted && allDocsApproved) {
     this.partnerDetails.approved = true;
     this.verificationStatus = 'Approved';
   } else if (allDocsSubmitted && !allDocsApproved) {
     this.verificationStatus = 'Pending';
+  } else {
+    this.verificationStatus = 'Not Submitted';
   }
   
   return this.save();
@@ -226,6 +234,16 @@ UserSchema.pre('save', async function(next) {
 // Method to compare entered password with stored password
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Method to update verification document
+UserSchema.methods.updateVerificationDocument = async function(docType, path) {
+  this.verificationDocuments[docType] = {
+    path,
+    uploadedAt: new Date(),
+    status: 'Approved', // Auto-approve
+  };
+  return this.save();
 };
 
 const User = mongoose.model('User', UserSchema);

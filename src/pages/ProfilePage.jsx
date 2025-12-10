@@ -69,9 +69,7 @@ const ProfilePage = () => {
           name: userData.username || "User",
           email: userData.email || "",
           phone: userData.phone || "Not provided",
-          // isVerified: userData.isVerified || false,
-          //i have commented the above code because the prompt that i made to verify user is not showing up
-          isVerified:  false,
+          isVerified: userData.verificationStatus === 'Approved',
           profileImage: userData.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.username)}&background=random&size=200`,
           walletBalance: userData.walletBalance || "0.00",
           stats: userData.stats || {
@@ -227,6 +225,12 @@ const ProfilePage = () => {
                       Phone number- {profileData.phone}
                     </p>
                   </div>
+
+                  {profileData.isVerified && (
+                    <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold ml-2">
+                      Verified
+                    </span>
+                  )}
                 </div>
                 {/* Edit Profile Button in separate div */}
                 <div className="flex items-start mt-2 md:mt-0 md:ml-auto">

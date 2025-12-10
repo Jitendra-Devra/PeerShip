@@ -1,8 +1,9 @@
-import express from 'express';
 import dotenv from 'dotenv';
+import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { protect } from './src/middleware/authMiddleware.js';
 import connectDB from './src/database/dbConnect.js';
 import authRoutes from './src/api/routes/authRoutes.js';
 import vehicleRoutes from './src/api/routes/vehicleRoutes.js';
@@ -11,13 +12,17 @@ import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import configurePassport from './src/auth/passport.js';
 import User from './src/database/models/User.js'; 
+import mongoose from 'mongoose';
+import cron from 'node-cron';
+
+// Load environment variables
+dotenv.config();
+
+console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
 // ES Module fix for __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-// Load environment variables
-dotenv.config();
 
 const app = express(); // ✅ Define `app` before using it
 
@@ -26,13 +31,11 @@ app.use(express.json());
 
 // Enable CORS
 app.use(cors({
-  origin: ['http://localhost:5173'], // ✅ Add production frontend URL when deploying
+  origin: ['http://localhost:5173'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Authorization'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Disposition']
 }));
 
 // Cookie parser
@@ -79,6 +82,29 @@ app.get('/api/profile-picture/:userId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching profile picture:', error);
     res.redirect('https://ui-avatars.com/api/?background=random');
+  }
+});
+
+
+
+mongoose.connection.once('open', () => {
+  console.log(`✅ MongoDB Connected: ${mongoose.connection.host}`);
+});
+
+
+// Approve users after 2 minutes if status is Pending
+cron.schedule('*/1 * * * *', async () => {
+  const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+  const users = await User.find({
+    verificationStatus: 'Pending',
+    verificationRequestedAt: { $lte: twoMinutesAgo }
+  });
+
+  for (const user of users) {
+    user.verificationStatus = 'Approved';
+    user.partnerDetails.approved = true;
+    await user.save();
+    // Optionally: send notification/email here
   }
 });
 

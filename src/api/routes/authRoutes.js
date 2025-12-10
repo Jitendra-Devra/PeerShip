@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import User from '../../database/models/User.js';
 import { deleteAccount } from '../../auth/authController.js';
-import { signup, signin, getUserProfile, updateProfilePicture, forgotPassword, updateUserProfile } from '../../auth/authController.js';
+import { signup, signin, getUserProfile, updateProfilePicture, forgotPassword, updateUserProfile, uploadVerificationDocument,deleteVerificationDocument } from '../../auth/authController.js';
 import { protect } from '../../middleware/authMiddleware.js';
 import { generateResetToken, sendPasswordResetEmail } from '../../utils/passwordUtils.js';
+import cloudinaryUpload from '../../utils/cloudinaryUpload.js'; 
 
 const router = express.Router();
 const googleOAuthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -167,6 +168,15 @@ router.post('/signin', signin);
 router.get('/profile', protect, getUserProfile); // Fetch user profile
 router.put('/profile', protect, updateUserProfile); // Update user profile
 router.put('/profile/picture', protect, updateProfilePicture); // Update profile picture
+router.put(
+  '/verification-document',
+  protect,
+  cloudinaryUpload.single('file'),
+  uploadVerificationDocument
+); // Upload verification document
+router.delete(
+  '/verification-document/:docType',protect,deleteVerificationDocument
+);
 router.delete('/delete-account',protect,deleteAccount); // Delete account
 
 export default router;

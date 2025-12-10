@@ -1,7 +1,10 @@
 import asyncHandler from 'express-async-handler';
 import User from '../database/models/User.js';
+import { v2 as cloudinary } from 'cloudinary';
 import { generateToken } from '../utils/tokenUtils.js';
 import { generateResetToken, sendPasswordResetEmail } from '../utils/passwordUtils.js';
+import mongoose from 'mongoose';
+import Grid from 'gridfs-stream';
 
 // @desc    Register a new user
 // @route   POST /api/auth/signup
@@ -130,7 +133,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
       country: user.country || '',
       profilePicture: profilePicture,
       walletBalance: user.walletBalance || "0.00",
-      isGoogleUser: user.isGoogleUser || false
+      isGoogleUser: user.isGoogleUser || false,
+      verificationStatus: user.verificationStatus,
+      verificationDocuments: user.verificationDocuments,
     });
   } catch (error) {
     res.status(500);
@@ -287,4 +292,90 @@ const deleteAccount = asyncHandler(async (req, res) => {
   }
 });
 
-export { signup, signin, getUserProfile, updateUserProfile, updateProfilePicture, forgotPassword, deleteAccount };
+// @desc    Upload or update a verification document
+// @route   PUT /api/auth/verification-document
+const uploadVerificationDocument = asyncHandler(async (req, res) => {
+  const { docType } = req.body;
+  if (!['governmentId', 'proofOfAddress', 'proofOfInsurance', 'vehicleRegistrationCertificate'].includes(docType)) {
+    return res.status(400).json({ message: 'Invalid document type' });
+  }
+
+  // The file is uploaded to Cloudinary by the middleware and details are in req.file
+  if (!req.file) {
+    return res.status(400).json({ message: 'No file uploaded or file type is invalid.' });
+  }
+
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // IMPORTANT: If replacing a document, delete the old one from Cloudinary
+    const prevDoc = user.verificationDocuments?.[docType];
+    if (prevDoc && prevDoc.publicId) {
+      await cloudinary.uploader.destroy(prevDoc.publicId);
+    }
+
+    // Save the new file's URL and public_id to the user document
+    user.verificationDocuments[docType] = {
+      path: req.file.path, // This is the secure URL from Cloudinary
+      publicId: req.file.filename, // This is the public_id from Cloudinary
+      uploadedAt: new Date(),
+      status: 'Approved', // Or 'Pending' if you want a manual review step
+    };
+
+    // Update the user's overall verification status
+    await user.checkVerificationStatus();
+    await user.save();
+
+    res.json({
+      message: 'Document uploaded successfully',
+      verificationDocuments: user.verificationDocuments,
+      verificationStatus: user.verificationStatus,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+
+// @desc    Delete a verification document
+// @route   DELETE /api/auth/verification-document/:docType
+const deleteVerificationDocument = asyncHandler(async (req, res) => {
+  const { docType } = req.params;
+  
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const docToDelete = user.verificationDocuments?.[docType];
+    if (!docToDelete || !docToDelete.publicId) {
+      return res.status(404).json({ message: 'Document not found or already deleted.' });
+    }
+
+    // 1. Delete the file from Cloudinary
+    await cloudinary.uploader.destroy(docToDelete.publicId);
+
+    // 2. Clear the fields in the user document
+    user.verificationDocuments[docType] = {
+      path: null,
+      publicId: null,
+      uploadedAt: null,
+      status: 'Not Submitted',
+    };
+    
+    // 3. Update overall status and save
+    await user.checkVerificationStatus();
+    await user.save();
+    res.json({ 
+      message: 'Document deleted successfully',
+      verificationStatus: user.verificationStatus,
+      verificationDocuments: user.verificationDocuments
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+export { signup, signin, getUserProfile, updateUserProfile,uploadVerificationDocument,deleteVerificationDocument, updateProfilePicture, forgotPassword, deleteAccount };
